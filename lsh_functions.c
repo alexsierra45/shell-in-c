@@ -20,10 +20,106 @@ char *lsh_read_line(void) {
 
   return line;
 }
+char *decod_line(char *line) {
+    char *aux_line = (char *) malloc(3 * strlen(line));
+
+    int len = (int) strlen(line);
+    int j = 0;
+    for (int i = 0; i < len; i++) {
+        if (line[i] == '#')
+            break;
+
+        if (line[i] == ' ') {
+            if (i != 0) {
+                if (line[i - 1] == ' ') continue;
+            } else
+                continue;
+        }
+
+        if (line[i] == '<') {
+            if (i != 0) {
+                if (line[i - 1] != ' ') {
+                    aux_line[j++] = ' ';
+                }
+            }
+            aux_line[j++] = line[i];
+            if (i != len - 1) {
+                if (line[i + 1] != ' ') {
+                    aux_line[j++] = ' ';
+                }
+            }
+
+            continue;
+        }
+
+        if (line[i] == '>') {
+            if (i != 0) {
+                if (line[i - 1] != ' ' && line[i - 1] != '>') {
+                    aux_line[j++] = ' ';
+                }
+            }
+            aux_line[j++] = line[i];
+            if (i != sizeof(line) - 1) {
+                if (line[i + 1] != ' ' && line[i + 1] != '>') {
+                    aux_line[j++] = ' ';
+                }
+            }
+
+            continue;
+        }
+
+        if (line[i] == '|') {
+            if (i != 0) {
+                if (line[i - 1] != ' ' && line[i - 1] != '|') {
+                    aux_line[j++] = ' ';
+                }
+            }
+            aux_line[j++] = line[i];
+            if (i != len - 1) {
+                if (line[i + 1] != ' ' && line[i + 1] != '|') {
+                    aux_line[j++] = ' ';
+                }
+            }
+
+            continue;
+        }
+
+        if (line[i] == '&') {
+            if (i != len - 1 && i != 0) {
+                if (line[i - 1] != ' ' && line[i + 1] == '&') {
+                    aux_line[j++] = ' ';
+                }
+            }
+            aux_line[j++] = line[i];
+            if (i != 0 && i != len - 1) {
+                if (line[i + 1] != ' ' && line[i - 1] == '&') {
+                    aux_line[j++] = ' ';
+                }
+            }
+
+            continue;
+        }
+
+        aux_line[j++] = line[i];
+    }
+
+    char *new_line = (char *) malloc(j + 1);
+
+    for (int x = 0; x < j; x++) {
+        new_line[x] = aux_line[x];
+    }
+    free(aux_line);
+
+    if (new_line[j - 1] != '\n') new_line[j++] = '\n';
+    new_line[j] = 0;
+
+    return (char *) new_line;
+}
 
 #define LSH_TOK_BUFSIZE 64
 #define LSH_TOK_DELIM " \t\r\n\a"
 char **lsh_split_line(char *line) {
+  char *decoded_line = decod_line(line);
   int bufsize = LSH_TOK_BUFSIZE, position = 0;
   char **tokens = malloc(bufsize * sizeof(char*));
   char *token;
@@ -33,7 +129,7 @@ char **lsh_split_line(char *line) {
     exit(EXIT_FAILURE);
   }
 
-  token = strtok(line, LSH_TOK_DELIM);
+  token = strtok(decoded_line, LSH_TOK_DELIM);
   while (token != NULL) {
     tokens[position] = token;
     position++;
