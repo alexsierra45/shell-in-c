@@ -36,6 +36,22 @@ char *decod_line(char *line) {
                 continue;
         }
 
+        if (line[i] == ';') {
+            if (i != 0) {
+                if (line[i - 1] != ' ') {
+                    aux_line[j++] = ' ';
+                }
+            }
+            aux_line[j++] = line[i];
+            if (i != len - 1) {
+                if (line[i + 1] != ' ') {
+                    aux_line[j++] = ' ';
+                }
+            }
+
+            continue;
+        }
+
         if (line[i] == '<') {
             if (i != 0) {
                 if (line[i - 1] != ' ') {
