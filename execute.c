@@ -11,25 +11,6 @@
 
 int lsh_execute(char **args);
 
-// arr copy
-char **arr_cpy(char **arr, int i, int bool) {
-  int bufsize = LSH_TOK_BUFSIZE, position = 0;
-  char **a_c = malloc(bufsize * sizeof(char*));
-
-  if (bool) {
-    while (position < i) 
-      a_c[position] = arr[position++];
-    a_c[i] = NULL;
-  }
-  else {
-    while (arr[i] != NULL) 
-      a_c[position++] = arr[i++];
-    a_c[position] = NULL;
-  }
-  
-  return a_c;
-}
-
 // Function Declarations for builtin shell commands:
 int lsh_cd(char **args);
 int lsh_help(char **args);
@@ -50,6 +31,27 @@ int (*builtin_func[]) (char **) = {
 
 int lsh_num_builtins() {
   return sizeof(builtin_str) / sizeof(char *);
+}
+
+// arr copy
+char **arr_cpy(char **arr, int i, int bool) {
+  int bufsize = LSH_TOK_BUFSIZE, position = 0;
+  char **a_c = malloc(bufsize * sizeof(char*));
+
+  if (bool) {
+    while (position < i) {
+      a_c[position] = arr[position];
+      position++;
+    }
+    a_c[i] = NULL;
+  }
+  else {
+    while (arr[i] != NULL) 
+      a_c[position++] = arr[i++];
+    a_c[position] = NULL;
+  }
+  
+  return a_c;
 }
 
 // Builtin function implementations.
@@ -90,7 +92,7 @@ int lsh_exit(char **args) {
 int lsh_launch(char **args) {
   pid_t pid, wpid;
   int status;
-
+  
   pid = fork();
   if (pid == 0) {
     // Child process
@@ -112,87 +114,123 @@ int lsh_launch(char **args) {
 }
 
 int check_pipes(char **args) {
+  for (int i = 0; args[i] != NULL; i++) {
+    if (strcmp(args[i], "|") == 0) {
+      char **a_bef = arr_cpy(args, i, 1);
+      char **a_aft = arr_cpy(args, i+1, 0);
+      pid_t pid;
+      int fd[2];
+      int in = dup(0);
+      int out = dup(1);
+      pipe(fd);
+
+      pid = fork();
+      if (pid == 0) {
+        close(fd[0]);
+        dup2(fd[1], 1);
+        close(fd[1]);
+        execvp(a_bef[0], a_bef);
+      }
+      else if (pid < 0)
+        perror(ERROR);
+      else {
+        wait(NULL);
+        close(fd[1]);
+        dup2(fd[0], 0);
+        close(fd[0]);
+        lsh_execute(a_aft);
+      }
+
+      dup2(in, 0);
+      close(in);
+      dup2(out, 1);
+      close(out);
+
+      return 0;
+    }
+  }
+  return 1;
 }
 
-// Redirect output to file.
-int redirect_out(char *fileName, int fd) {
-    int fd2 = open(fileName, O_RDONLY);
-    if (fd2 == -1) {
-        perror("open");
-        return 1;
-    }
-    if (dup2(fd2, fd) == -1) {
-        perror("dup2");
-        return 1;
-    }
-    if (close(fd2) == -1) {
-        perror("close");
-        return 1;
-    }
-    return 0;
-}
+// // Redirect output to file.
+// int redirect_out(char *fileName, int fd) {
+//     int fd2 = open(fileName, O_RDONLY);
+//     if (fd2 == -1) {
+//         perror("open");
+//         return 1;
+//     }
+//     if (dup2(fd2, fd) == -1) {
+//         perror("dup2");
+//         return 1;
+//     }
+//     if (close(fd2) == -1) {
+//         perror("close");
+//         return 1;
+//     }
+//     return 0;
+// }
 
-// Redirect input from file.
-int redirect_in(char *fileName, int fd) {
-    int fd2 = open(fileName, O_WRONLY | O_CREAT | O_TRUNC, 0644);
-    if (fd2 == -1) {
-        perror("open");
-        return 1;
-    }
-    if (dup2(fd2, fd) == -1) {
-        perror("dup2");
-        return 1;
-    }
-    if (close(fd2) == -1) {
-        perror("close");
-        return 1;
-    }
-    return 0;
-}
+// // Redirect input from file.
+// int redirect_in(char *fileName, int fd) {
+//     int fd2 = open(fileName, O_WRONLY | O_CREAT | O_TRUNC, 0644);
+//     if (fd2 == -1) {
+//         perror("open");
+//         return 1;
+//     }
+//     if (dup2(fd2, fd) == -1) {
+//         perror("dup2");
+//         return 1;
+//     }
+//     if (close(fd2) == -1) {
+//         perror("close");
+//         return 1;
+//     }
+//     return 0;
+// }
 
-int check_redirectors(char ** args) {
-    int bufsize = LSH_TOK_BUFSIZE, position = 0;
-    char **new_arr = malloc(bufsize * sizeof(char*));
-    int i = 0;
+// int check_redirectors(char ** args) {
+//     int bufsize = LSH_TOK_BUFSIZE, position = 0;
+//     char **new_arr = malloc(bufsize * sizeof(char*));
+//     int i = 0;
 
-    while (args[i] != NULL) {
-        if (strcmp(args[i], "<") == 0) {
-            redirect_in(args[i+1], STDIN_FILENO);
-            int pid = fork();
-            if (pid == 0) {
-                execvp(args[i-1], args);
-            }
-            else if (pid > 0) {
-                wait(NULL);
-            }
-            else {
-                printf("Error al crear el proceso hijo\n");
-                return 1;
-            }
-        }
-        else if (strcmp(args[i], ">") == 0) {
-            redirect_out(args[i+1], STDOUT_FILENO);
-        }
-        i++;
-        new_arr[position++] = args[i];
-    }
-}
+//     while (args[i] != NULL) {
+//         if (strcmp(args[i], "<") == 0) {
+//             redirect_in(args[i+1], STDIN_FILENO);
+//             int pid = fork();
+//             if (pid == 0) {
+//                 execvp(args[i-1], args);
+//             }
+//             else if (pid > 0) {
+//                 wait(NULL);
+//             }
+//             else {
+//                 printf("Error al crear el proceso hijo\n");
+//                 return 1;
+//             }
+//         }
+//         else if (strcmp(args[i], ">") == 0) {
+//             redirect_out(args[i+1], STDOUT_FILENO);
+//         }
+//         i++;
+//         new_arr[position++] = args[i];
+//     }
+// }
 
 // Execute shell built-in or launch program.
 int lsh_execute(char **args) {
-  int i;
-
   if (args[0] == NULL) {
     printf("An empty command was entered, don't be a fool.\n");
     return 1;
   }
-  check_redirectors(args);
-  // check_pipes(args);
-  for (i = 0; i < lsh_num_builtins(); i++) {
-    if (strcmp(args[0], builtin_str[i]) == 0) {
-      return (*builtin_func[i])(args);
+  if (check_pipes(args) != 0) {
+    for (int i = 0; i < lsh_num_builtins(); i++) {
+      if (strcmp(args[0], builtin_str[i]) == 0) {
+        return (*builtin_func[i])(args);
+      }
     }
-  }
 
-  return lsh_launch(args);
+    return lsh_launch(args);
+  }
+  
+  return 1;
 }
