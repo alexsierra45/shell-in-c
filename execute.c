@@ -88,14 +88,31 @@ int lsh_exit(char **args) {
   return 0;
 }
 
+// Check < value in args
+int check_red_in(char **args) {
+  for (int i = 0; args[i] != NULL; i++) {
+    if (strcmp(args[i], "<") == 0) return i;
+  }
+
+  return 0;
+}
+
 // Launch a program and wait for it to terminate.
 int lsh_launch(char **args) {
   pid_t pid, wpid;
   int status;
+  int redin = check_red_in(args);
+  int in = dup(0);
   
   pid = fork();
   if (pid == 0) {
     // Child process
+    if (redin > 0) {
+      args[redin] = NULL;
+      int fd = open(args[redin+1], 64);
+      dup2(fd, 0);
+      close(fd);
+    }
     if (execvp(args[0], args) == -1) {
       perror("lsh");
     }
@@ -108,6 +125,10 @@ int lsh_launch(char **args) {
     do {
       wpid = waitpid(pid, &status, WUNTRACED);
     } while (!WIFEXITED(status) && !WIFSIGNALED(status));
+  }
+  if (redin != 0) {
+    dup2(in , 0);
+    close(in);
   }
 
   return 1;
@@ -151,70 +172,6 @@ int check_pipes(char **args) {
   }
   return 1;
 }
-
-// // Redirect output to file.
-// int redirect_out(char *fileName, int fd) {
-//     int fd2 = open(fileName, O_RDONLY);
-//     if (fd2 == -1) {
-//         perror("open");
-//         return 1;
-//     }
-//     if (dup2(fd2, fd) == -1) {
-//         perror("dup2");
-//         return 1;
-//     }
-//     if (close(fd2) == -1) {
-//         perror("close");
-//         return 1;
-//     }
-//     return 0;
-// }
-
-// // Redirect input from file.
-// int redirect_in(char *fileName, int fd) {
-//     int fd2 = open(fileName, O_WRONLY | O_CREAT | O_TRUNC, 0644);
-//     if (fd2 == -1) {
-//         perror("open");
-//         return 1;
-//     }
-//     if (dup2(fd2, fd) == -1) {
-//         perror("dup2");
-//         return 1;
-//     }
-//     if (close(fd2) == -1) {
-//         perror("close");
-//         return 1;
-//     }
-//     return 0;
-// }
-
-// int check_redirectors(char ** args) {
-//     int bufsize = LSH_TOK_BUFSIZE, position = 0;
-//     char **new_arr = malloc(bufsize * sizeof(char*));
-//     int i = 0;
-
-//     while (args[i] != NULL) {
-//         if (strcmp(args[i], "<") == 0) {
-//             redirect_in(args[i+1], STDIN_FILENO);
-//             int pid = fork();
-//             if (pid == 0) {
-//                 execvp(args[i-1], args);
-//             }
-//             else if (pid > 0) {
-//                 wait(NULL);
-//             }
-//             else {
-//                 printf("Error al crear el proceso hijo\n");
-//                 return 1;
-//             }
-//         }
-//         else if (strcmp(args[i], ">") == 0) {
-//             redirect_out(args[i+1], STDOUT_FILENO);
-//         }
-//         i++;
-//         new_arr[position++] = args[i];
-//     }
-// }
 
 // Execute shell built-in or launch program.
 int lsh_execute(char **args) {
