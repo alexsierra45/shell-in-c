@@ -4,6 +4,7 @@
 #include <unistd.h>
 #include <sys/wait.h>
 #include <fcntl.h>
+#include "help.c"
 
 // Check < value in args
 int check_red_in(char **args) {

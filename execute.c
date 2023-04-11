@@ -4,10 +4,7 @@
 #include <unistd.h>
 #include <sys/wait.h>
 #include <fcntl.h>
-
-#define MY_SH_TOK_DELIM " \t\r\n\a"
-#define ERROR "\033[1;31mmy_sh\033[0m"
-#define LSH_TOK_BUFSIZE 64
+#include "pipes_redirectors.c"
 
 int lsh_execute(char **args, int fdin, int fdout);
 
@@ -31,27 +28,6 @@ int (*builtin_func[]) (char **) = {
 
 int lsh_num_builtins() {
   return sizeof(builtin_str) / sizeof(char *);
-}
-
-// arr copy
-char **arr_cpy(char **arr, int i, int bool) {
-  int bufsize = LSH_TOK_BUFSIZE, position = 0;
-  char **a_c = malloc(bufsize * sizeof(char*));
-
-  if (bool) {
-    while (position < i) {
-      a_c[position] = arr[position];
-      position++;
-    }
-    a_c[i] = NULL;
-  }
-  else {
-    while (arr[i] != NULL) 
-      a_c[position++] = arr[i++];
-    a_c[position] = NULL;
-  }
-  
-  return a_c;
 }
 
 // Builtin function implementations.
