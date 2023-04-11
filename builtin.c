@@ -9,18 +9,24 @@
 int shell_cd(char **args);
 int shell_help(char **args);
 int shell_exit(char **args);
+int shell_true(char **args);
+int shell_false(char **args);
 
 // List of builtin commands, followed by their corresponding functions.
 char *builtin_str[] = {
   "cd",
   "help",
-  "exit"
+  "exit",
+  "true",
+  "false"
 };
 
 int (*builtin_func[]) (char **) = {
   &shell_cd,
   &shell_help,
-  &shell_exit
+  &shell_exit, 
+  &shell_true, 
+  &shell_false
 };
 
 int lsh_num_builtins() {
@@ -58,5 +64,15 @@ int shell_help(char **args) {
 
 // Exit builtin command.
 int shell_exit(char **args) {
+  return 0;
+}
+
+// True builtin command.
+int shell_true(char **args) {
+  return 1;
+}
+
+// False builtin command.
+int shell_false(char **args) {
   return 0;
 }
