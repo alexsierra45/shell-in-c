@@ -2,7 +2,7 @@
 
 int main(int arcg, char *argv[]) {
 
-    lsh_loop();
+    loop();
 
     return 0;
 }

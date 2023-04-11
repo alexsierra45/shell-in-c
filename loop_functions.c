@@ -5,7 +5,7 @@
 #include <sys/wait.h>
 #include "execute.c"
 
-char *lsh_read_line(void) {
+char *read_line(void) {
   char *line = NULL;
   ssize_t bufsize = 0; // have getline allocate a buffer for us
 
@@ -134,7 +134,7 @@ char *decod_line(char *line) {
 
 #define LSH_TOK_BUFSIZE 64
 #define LSH_TOK_DELIM " \t\r\n\a"
-char **lsh_split_line(char *line) {
+char **split_line(char *line) {
   char *decoded_line = decod_line(line);
   int bufsize = LSH_TOK_BUFSIZE, position = 0;
   char **tokens = malloc(bufsize * sizeof(char*));
@@ -165,15 +165,15 @@ char **lsh_split_line(char *line) {
   return tokens;
 }
 
-void lsh_loop(void) {
+void loop(void) {
   char *line;
   char **args;
   int status;
 
   do {
     printf("myshell$ ");
-    line = lsh_read_line();
-    args = lsh_split_line(line);
+    line = read_line();
+    args = split_line(line);
     status = execute(args, 0, 1);
 
     free(line);
