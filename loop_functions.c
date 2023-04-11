@@ -3,7 +3,12 @@
 #include <string.h>
 #include <unistd.h>
 #include <sys/wait.h>
+#include <pwd.h>
 #include "execute.c"
+
+#define BLUE "\033[1;34m"
+#define RESET "\033[0m"
+#define GREEN "\033[1;32m"
 
 char *read_line(void) {
   char *line = NULL;
@@ -170,13 +175,16 @@ void loop(void) {
   char *line;
   char **args;
   int status;
+  char cwd[128];
+  char *prompt = "\033[0;32mmyshell\033[0m";
+  struct passwd *pw = getpwuid(getuid());
 
   do {
-    printf("myshell$ ");
+    getcwd(cwd, sizeof(cwd));
+    printf("%smyshell@%s%s:%s~%s%s$ ", GREEN, pw->pw_name, RESET, BLUE, cwd, RESET);
     line = read_line();
     args = split_line(line);
     status = execute(args, 0, 1);
-
     free(line);
     free(args);
   } while (status);

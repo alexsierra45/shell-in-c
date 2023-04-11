@@ -188,7 +188,7 @@ int execute(char **args, int fdin, int fdout) {
             }
             else wait(NULL);
 
-            return 0;
+            return 1;
           }
         }
       }
