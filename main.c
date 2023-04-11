@@ -1,4 +1,4 @@
-#include "lsh_functions.c"
+#include "loop_functions.c"
 
 int main(int arcg, char *argv[]) {
 

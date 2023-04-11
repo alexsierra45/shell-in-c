@@ -5,7 +5,7 @@
 #include <sys/wait.h>
 #include <fcntl.h>
 #include "builtin.c"
-#include "help_methods.c"
+#include "help_functions.c"
 
 int execute(char **args, int fdin, int fdout);
 
@@ -145,18 +145,24 @@ int execute(char **args, int fdin, int fdout) {
     printf("An empty command was entered, don't be a fool.\n");
     return 1;
   }
-  if (pipes(args, fdin, fdout) != 0) {
-    for (int i = 0; i < lsh_num_builtins(); i++) {
-      if (strcmp(args[0], builtin_str[i]) == 0) {
-        return (*builtin_func[i])(args);
+  if (chain(args, fdin, fdout) != 0) {
+    if (chain_and(args, fdin, fdout) != 0) {
+      if (chain_or(args, fdin, fdout) != 0) {
+        if (pipes(args, fdin, fdout) != 0) {
+          for (int i = 0; i < lsh_num_builtins(); i++) {
+            if (strcmp(args[0], builtin_str[i]) == 0) {
+              return (*builtin_func[i])(args);
+            }
+          }
+
+          int pid = fork();
+          if (pid == 0) {
+            shell_launch(args, fdin, fdout);
+          }
+          else wait(NULL);
+        }
       }
     }
-
-    int pid = fork();
-    if (pid == 0) {
-      shell_launch(args, fdin, fdout);
-    }
-    else wait(NULL);
   }
   
   return 1;
