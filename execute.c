@@ -29,7 +29,7 @@ int check_red_out(char **args) {
 }
 
 // Launch a program.
-void shell_launch(char **args, int fdin, int fdout) {
+int shell_launch(char **args, int fdin, int fdout) {
   pid_t pid, wpid;
   int status;
   int in = dup(0);
@@ -87,6 +87,51 @@ int pipes(char **args, int fdin, int fdout) {
       close(in);
       close(out);
 
+      return 0;
+    }
+  }
+
+  return 1;
+}
+
+// Chain commands
+
+// Chain ;
+int chain(char **args, int fdin, int fdout) {
+  for (int i = 0; args[i] != NULL; i++) {
+    if (strcmp(args[i], ";") == 0) {
+      char **a_bef = arr_cpy(args, i, 1);
+      char **a_aft = arr_cpy(args, i+1, 0);
+      execute(a_bef, fdin, fdout);
+      execute(a_aft, fdin, fdout);
+      return 0;
+    }
+  }
+
+  return 1;
+}
+
+// Chain &&
+int chain_and(char **args, int fdin, int fdout) {
+  for (int i = 0; args[i] != NULL; i++) {
+    if (strcmp(args[i], "&&") == 0) {
+      char **a_bef = arr_cpy(args, i, 1);
+      char **a_aft = arr_cpy(args, i+1, 0);
+      if (execute(a_bef, fdin, fdout) == 0) execute(a_aft, fdin, fdout);
+      return 0;
+    }
+  }
+
+  return 1;
+}
+
+// Chain ||
+int chain_or(char **args, int fdin, int fdout) {
+  for (int i = 0; args[i] != NULL; i++) {
+    if (strcmp(args[i], "||") == 0) {
+      char **a_bef = arr_cpy(args, i, 1);
+      char **a_aft = arr_cpy(args, i+1, 0);
+      if (execute(a_bef, fdin, fdout) != 0) execute(a_aft, fdin, fdout);
       return 0;
     }
   }
