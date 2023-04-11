@@ -187,6 +187,8 @@ int execute(char **args, int fdin, int fdout) {
               shell_launch(args, fdin, fdout);
             }
             else wait(NULL);
+
+            return 0;
           }
         }
       }
