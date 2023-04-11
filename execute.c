@@ -9,7 +9,7 @@
 #define ERROR "\033[1;31mmy_sh\033[0m"
 #define LSH_TOK_BUFSIZE 64
 
-int lsh_execute(char **args, int fdin, int fdout);
+int execute(char **args, int fdin, int fdout);
 
 // Function Declarations for builtin shell commands:
 int lsh_cd(char **args);
@@ -157,7 +157,7 @@ int pipes(char **args, int fdin, int fdout) {
       } else {
         wait(NULL);
         close(fd[1]);
-        lsh_execute(a_aft, fd[0], fdout);
+        execute(a_aft, fd[0], fdout);
         close(fd[0]);
       }
 
@@ -174,7 +174,7 @@ int pipes(char **args, int fdin, int fdout) {
 }
 
 // Execute shell built-in or launch program.
-int lsh_execute(char **args, int fdin, int fdout) {
+int execute(char **args, int fdin, int fdout) {
   if (args[0] == NULL) {
     printf("An empty command was entered, don't be a fool.\n");
     return 1;
