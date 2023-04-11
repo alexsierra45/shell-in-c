@@ -174,7 +174,7 @@ void lsh_loop(void) {
     printf("myshell$ ");
     line = lsh_read_line();
     args = lsh_split_line(line);
-    status = lsh_execute(args);
+    status = lsh_execute(args, 0, 1);
 
     free(line);
     free(args);
