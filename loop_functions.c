@@ -20,6 +20,7 @@ char *read_line(void) {
 
   return line;
 }
+
 char *decod_line(char *line) {
     char *aux_line = (char *) malloc(3 * strlen(line));
 
