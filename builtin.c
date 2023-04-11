@@ -69,10 +69,10 @@ int shell_exit(char **args) {
 
 // True builtin command.
 int shell_true(char **args) {
-  return 1;
+  return 0;
 }
 
 // False builtin command.
 int shell_false(char **args) {
-  return 0;
+  return 1;
 }

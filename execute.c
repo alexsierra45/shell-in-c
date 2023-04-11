@@ -139,27 +139,55 @@ int chain_or(char **args, int fdin, int fdout) {
   return 1;
 }
 
+// Conditional execution
+int conditions(char **args, int fdin, int fdout) {
+  if (strcmp(args[0], "if") == 0) {
+    int i = 1;
+    args = arr_cpy(args, i, 0);
+    i = 0;
+    while (strcmp(args[i], "then") != 0) i++;
+    char **a_if = arr_cpy(args, i, 1);
+    args = arr_cpy(args, i+1, 0);
+    i = 0;
+    while (strcmp(args[i], "else") != 0) i++;
+    char **a_then = arr_cpy(args, i, 1);
+    args = arr_cpy(args, i+1, 0);
+    i = 0;
+    while (strcmp(args[i], "end") != 0) i++;
+    char **a_else = arr_cpy(args, i, 1);
+    if (execute(a_if, fdin, fdout) == 0) execute(a_then, fdin, fdout);
+    else execute(a_else, fdin, fdout);
+
+    return 0;
+  }
+
+  return 1;
+}
+
 // Execute shell built-in or launch program.
 int execute(char **args, int fdin, int fdout) {
   if (args[0] == NULL) {
     printf("An empty command was entered, don't be a fool.\n");
     return 1;
   }
+  // Search for ;, &&, ||, conditions, |, <, >, >>, and execute them
   if (chain(args, fdin, fdout) != 0) {
     if (chain_and(args, fdin, fdout) != 0) {
       if (chain_or(args, fdin, fdout) != 0) {
-        if (pipes(args, fdin, fdout) != 0) {
-          for (int i = 0; i < lsh_num_builtins(); i++) {
-            if (strcmp(args[0], builtin_str[i]) == 0) {
-              return (*builtin_func[i])(args);
+        if (conditions(args, fdin, fdout) != 0) {
+          if (pipes(args, fdin, fdout) != 0) {
+            for (int i = 0; i < lsh_num_builtins(); i++) {
+              if (strcmp(args[0], builtin_str[i]) == 0) {
+                return (*builtin_func[i])(args);
+              }
             }
-          }
 
-          int pid = fork();
-          if (pid == 0) {
-            shell_launch(args, fdin, fdout);
+            int pid = fork();
+            if (pid == 0) {
+              shell_launch(args, fdin, fdout);
+            }
+            else wait(NULL);
           }
-          else wait(NULL);
         }
       }
     }
