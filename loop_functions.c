@@ -3,12 +3,16 @@
 #include <string.h>
 #include <unistd.h>
 #include <sys/wait.h>
+#include <sys/types.h>
+#include <signal.h>
 #include <pwd.h>
 #include "execute.c"
 
 #define BLUE "\033[1;34m"
 #define RESET "\033[0m"
 #define GREEN "\033[1;32m"
+
+void loop();
 
 char *read_line(void) {
   char *line = NULL;
@@ -171,15 +175,21 @@ char **split_line(char *line) {
   return tokens;
 }
 
-void loop(void) {
+void manage_ctrl_c(int signal) {
+    printf("\n");
+    exit(signal);
+}
+
+void loop() {
   char *line;
   char **args;
-  int status;
+  int status = 1;
   char cwd[128];
   char *prompt = "\033[0;32mmyshell\033[0m";
   struct passwd *pw = getpwuid(getuid());
 
-  do {
+  signal(SIGINT, manage_ctrl_c);
+  while (status) {
     getcwd(cwd, sizeof(cwd));
     printf("%smyshell@%s%s:%s~%s%s$ ", GREEN, pw->pw_name, RESET, BLUE, cwd, RESET);
     line = read_line();
@@ -187,5 +197,5 @@ void loop(void) {
     status = execute(args, 0, 1);
     free(line);
     free(args);
-  } while (status);
+  }
 }
