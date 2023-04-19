@@ -38,7 +38,8 @@ int lsh_num_builtins() {
 // Change directory.
 int shell_cd(char **args) {
   if (args[1] == NULL) {
-    fprintf(stderr, "lsh: expected argument to \"cd\"\n");
+    char *home_dir = getenv("HOME");
+    int ret = chdir(home_dir);
   } else {
     if (chdir(args[1]) != 0) {
       perror("lsh");
@@ -49,16 +50,26 @@ int shell_cd(char **args) {
 
 // Help builtin command.
 int shell_help(char **args) {
-  int i;
-  printf("Shell-in-c's LSH\n");
-  printf("Type program names and arguments, and hit enter.\n");
-  printf("The following are built in:\n");
-
-  for (i = 0; i < lsh_num_builtins(); i++) {
-    printf("  %s\n", builtin_str[i]);
+  if (args[1] == NULL) {
+    int fd = open("help/general.txt", O_RDONLY);
+    char *buf = malloc(1000);
+    ssize_t bytes_read;
+    while ((bytes_read = read(fd, buf, 1000)) > 0) {
+        write(1, buf, bytes_read);
+    }
+    free(buf);
+    close(fd);
   }
+  // int i;
+  // printf("Shell-in-c's LSH\n");
+  // printf("Type program names and arguments, and hit enter.\n");
+  // printf("The following are built in:\n");
 
-  printf("Use the man command for information on other programs.\n");
+  // for (i = 0; i < lsh_num_builtins(); i++) {
+  //   printf("  %s\n", builtin_str[i]);
+  // }
+
+  // printf("Use the man command for information on other programs.\n");
   return 1;
 }
 

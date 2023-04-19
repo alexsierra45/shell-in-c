@@ -1,0 +1,18 @@
+Integrantes:
+Alex Sierra Alcala-C311
+Juan Carlos Espinosa Delgado-C311
+
+Funcionalidades:
+basic: Funcionalidades basicas del shell(3 puntos).
+multi-pipe: Tuberias multiples(1 punto).\n
+spaces: Mas de un espacio entre cada comando(0.5 puntos).
+chain: Operadores de cadenas(0.5 punto).
+if: Condiciones(1 punto).
+help: Ayuda(1 punto)
+
+Comandos built-in:
+cd: Cambia de directorio.
+exit: Termina el Shell.
+help: Muestra esta ayuda.
+true: Siempre devuelve 0.
+false: Siempre devuelve 1.
