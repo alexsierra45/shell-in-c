@@ -180,6 +180,8 @@ void manage_ctrl_c(int signal) {
     exit(signal);
 }
 
+// void manage_kill(int )
+
 void loop() {
   char *line;
   char **args;

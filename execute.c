@@ -30,8 +30,6 @@ int check_red_out(char **args) {
 
 // Launch a program.
 int shell_launch(char **args, int fdin, int fdout) {
-  pid_t pid, wpid;
-  int status;
   int in = dup(0);
   int out = dup(1);
   dup2(fdin, 0);
