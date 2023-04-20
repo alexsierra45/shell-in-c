@@ -1,0 +1,28 @@
+En este apartado tenemos los comandos ( ; , || , && ).
+
+El operador ; permite ejecutar varios comandos en la misma línea.
+
+El comando cmd1 && cmd2 ejecuta cmd1 y si este tiene éxito ejecuta cmd2
+
+El comando cmd1 || cmd2 ejecuta cmd1 y si este no tiene éxito ejecuta cmd2 en caso contrario no se ejecuta
+más nada.
+
+Adicionalmente se pueden combinar todos estos comandos en una sola línea. Contamos con otros 2 comandos 
+especiales (true, false) que simulan una condición que siempre se cumple y otra que nunca se cumple respectivamente.
+
+Ejemplo:
+
+my_sh $ cmd1; cmd2;
+my_sh $ cmd1 && cmd2
+my_sh $ cmd1 || cmd2
+my_sh $ cmd1 && cmd2; cmd3 || cmd4 # se ejecutará cmd1, si este tiene éxito se ejecutará cmd2. Luego, 
+sin importar lo que ocurrio anteriormente, se ejecutará cmd3 y si este no tiene exito se ejecutará cmd4.
+
+Implementación:
+
+Se parsea el comando introducido en busca de los operadores de este apartado. En caso de que la busqueda sea 
+satisfactoria se separan los comandos y de forma independiente se realizan los analisis 
+de los estados de finalizacion  de los proceso correspondientes a cada operador de cadena.
+
+Un problema con nuestra implementacion es que el orden en de prioridad de los operadores esta bien definido, primero
+se buscan los (;), luego los (&&) y finalmente los (||);
