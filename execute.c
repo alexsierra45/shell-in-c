@@ -147,7 +147,15 @@ int conditions(char **args, int fdin, int fdout) {
     char **a_if = arr_cpy(args, i, 1);
     args = arr_cpy(args, i+1, 0);
     i = 0;
-    while (strcmp(args[i], "else") != 0) i++;
+    while (strcmp(args[i], "else") != 0) {
+      if (args[i] == NULL) {
+        char **a_then = arr_cpy(args, i-1, 1);
+        if (execute(a_if, fdin, fdout)) execute(a_then, fdin, fdout);
+
+        return 0;
+      }
+      i++;
+    }
     char **a_then = arr_cpy(args, i, 1);
     args = arr_cpy(args, i+1, 0);
     i = 0;
