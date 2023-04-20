@@ -4,6 +4,7 @@
 #include <unistd.h>
 #include <sys/wait.h>
 #include <fcntl.h>
+#include <dirent.h>
 
 // Function Declarations for builtin shell commands:
 int shell_cd(char **args);
@@ -50,26 +51,31 @@ int shell_cd(char **args) {
 
 // Help builtin command.
 int shell_help(char **args) {
+  char *buf = malloc(1000);
+  ssize_t bytes_read;
   if (args[1] == NULL) {
     int fd = open("help/general.txt", O_RDONLY);
-    char *buf = malloc(1000);
     ssize_t bytes_read;
     while ((bytes_read = read(fd, buf, 1000)) > 0) {
-        write(1, buf, bytes_read);
+      write(1, buf, bytes_read);
     }
     free(buf);
     close(fd);
   }
-  // int i;
-  // printf("Shell-in-c's LSH\n");
-  // printf("Type program names and arguments, and hit enter.\n");
-  // printf("The following are built in:\n");
+  else {
+    char *file_name = args[1];
+    char help[100] = "help/";
+    char *new_str = strcat(help, strcat(file_name, ".txt"));
+    int fd = open(new_str, O_RDONLY);
+    while ((bytes_read = read(fd, buf, 1000)) > 0) {
+      write(1, buf, bytes_read);
+    }
+    free(buf);
+    close(fd);
 
-  // for (i = 0; i < lsh_num_builtins(); i++) {
-  //   printf("  %s\n", builtin_str[i]);
-  // }
+    return 1;
+  }
 
-  // printf("Use the man command for information on other programs.\n");
   return 1;
 }
 

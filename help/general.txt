@@ -16,3 +16,5 @@ exit: Termina el Shell.
 help: Muestra esta ayuda.
 true: Siempre devuelve 0.
 false: Siempre devuelve 1.
+
+Shell-in-C
