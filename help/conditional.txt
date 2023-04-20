@@ -11,10 +11,10 @@ se cumple y otra que nunca se cumple respectivamente.
 
 Ejemplo:
 
-my_sh $ if cond then execute end
-my_sh $ if cond then execute1 else execute2 end
-my_sh $ if true then execute end                  # simpre se ejecutará execute
-my_sh $ if false then execute end                 # nunca se ejecutará execute
+myshell $ if cond then execute end
+myshell $ if cond then execute1 else execute2 end
+myshell $ if true then execute end                  # simpre se ejecutará execute
+myshell $ if false then execute end                 # nunca se ejecutará execute
 
 Implementación:
 Se hace uso del metodo arr_cpy que recibe un array A y un indice y devuleve un subarray de A hasta el inidce 

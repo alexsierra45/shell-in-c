@@ -16,11 +16,11 @@ Adicionalmente se pueden combinar todas estos comandos en una sola línea.
 
 Ejemplo:
 
-my_sh $ cmd1 | cmd2
-my_sh $ cmd < file
-my_sh $ cmd > file
-my_sh $ cmd >> file
-my_sh $ cmd1 < file1 | cmd2 | cmd3 > file2 # el contenido de file1 se redirecciona a la entrada de cmd1,
+myshell $ cmd1 | cmd2
+myshell $ cmd < file
+myshell $ cmd > file
+myshell $ cmd >> file
+myshell $ cmd1 < file1 | cmd2 | cmd3 > file2 # el contenido de file1 se redirecciona a la entrada de cmd1,
 la salida de cmd1 se redirecciona a la entrada de cmd2, la salida de cmd2 se redirecciona a la entrada de
 cmd3 y la salida de cmd3 se redirecciona a file2.
 

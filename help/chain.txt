@@ -12,10 +12,10 @@ especiales (true, false) que simulan una condición que siempre se cumple y otra
 
 Ejemplo:
 
-my_sh $ cmd1; cmd2;
-my_sh $ cmd1 && cmd2
-my_sh $ cmd1 || cmd2
-my_sh $ cmd1 && cmd2; cmd3 || cmd4 # se ejecutará cmd1, si este tiene éxito se ejecutará cmd2. Luego, 
+myshell $ cmd1; cmd2;
+myshell $ cmd1 && cmd2
+myshell $ cmd1 || cmd2
+myshell $ cmd1 && cmd2; cmd3 || cmd4 # se ejecutará cmd1, si este tiene éxito se ejecutará cmd2. Luego, 
 sin importar lo que ocurrio anteriormente, se ejecutará cmd3 y si este no tiene exito se ejecutará cmd4.
 
 Implementación:

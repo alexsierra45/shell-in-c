@@ -10,6 +10,8 @@ chain: Operadores de cadenas(0.5 punto).
 if: Condiciones(1 punto).
 help: Ayuda(1 punto)
 
+Total: 7 puntos.
+
 Comandos built-in:
 cd: Cambia de directorio.
 exit: Termina el Shell.
