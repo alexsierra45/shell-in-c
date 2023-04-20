@@ -149,7 +149,7 @@ int conditions(char **args, int fdin, int fdout) {
     i = 0;
     while (strcmp(args[i], "else") != 0) {
       if (args[i] == NULL) {
-        char **a_then = arr_cpy(args, i-1, 1);
+        char **a_then = arr_cpy(args, i-2, 1);
         if (execute(a_if, fdin, fdout)) execute(a_then, fdin, fdout);
 
         return 0;
