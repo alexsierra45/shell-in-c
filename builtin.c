@@ -13,6 +13,18 @@ int shell_exit(char **args);
 int shell_true(char **args);
 int shell_false(char **args);
 
+char *sub_str(char *line, int init, int end) {
+  char *new_line = (char *) malloc(end - init + 1);
+
+  int i;
+  for (i = 0; i < end - init + 1; i++) {
+      new_line[i] = line[i + init];
+  }
+  new_line[i] = 0;
+
+  return new_line;
+}
+
 // List of builtin commands, followed by their corresponding functions.
 char *builtin_str[] = {
   "cd",
@@ -63,10 +75,25 @@ int shell_help(char **args) {
     close(fd);
   }
   else {
-    char *file_name = args[1];
+    char *cmd_name = args[1];
     char help[100] = "help/";
-    char *new_str = strcat(help, strcat(file_name, ".txt"));
+    char *new_str = strcat(help, strcat(cmd_name, ".txt"));
     int fd = open(new_str, O_RDONLY);
+    if (fd < 0) {
+      int size;
+      for (int i = 0; i < 100; i++) {
+        if (cmd_name[i] == '.') {
+          size = i;
+          break;
+        }
+      }
+      char *new_args[3] = {sub_str(cmd_name, 0, size-1), "--help", NULL};
+      int pid = fork();
+      if (pid == 0) execvp(new_args[0], new_args);
+      else wait(NULL);
+
+      return 1;
+    }
     while ((bytes_read = read(fd, buf, 1000)) > 0) {
       write(1, buf, bytes_read);
     }
