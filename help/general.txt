@@ -4,7 +4,7 @@ Juan Carlos Espinosa Delgado-C311
 
 Funcionalidades:
 basic: Funcionalidades basicas del shell(3 puntos).
-multi-pipe: Tuberias multiples(1 punto).\n
+multi-pipe: Tuberias multiples(1 punto).
 spaces: Mas de un espacio entre cada comando(0.5 puntos).
 chain: Operadores de cadenas(0.5 punto).
 if: Condiciones(1 punto).
