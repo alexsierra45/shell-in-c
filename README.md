@@ -5,3 +5,10 @@
 gcc -o main main.c
 ./main
 ```
+# Funcionalidades implementadas:
+- basic
+- multi-pipe
+- spaces
+- chain
+- if
+- help
