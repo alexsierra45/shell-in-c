@@ -24,5 +24,5 @@ Se parsea el comando introducido en busca de los operadores de este apartado. En
 satisfactoria se separan los comandos y de forma independiente se realizan los analisis 
 de los estados de finalizacion  de los proceso correspondientes a cada operador de cadena.
 
-Un problema con nuestra implementacion es que el orden en de prioridad de los operadores esta bien definido, primero
+Un problema con nuestra implementacion es que el orden de prioridad de los operadores esta bien definido, primero
 se buscan los (;), luego los (&&) y finalmente los (||);
