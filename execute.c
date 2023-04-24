@@ -177,8 +177,18 @@ int background(char **args, int fdin, int fdout) {
       args[i] = NULL;
       int pid = fork();
       if (pid == 0) {
+        setpgid(0, 0);
         execute(args, fdin, fdout);
         exit(0);
+      }
+      if (pid > 0) {
+        setpgid(pid, pid);
+        char *path = "background/jobs.txt";
+        FILE *f = fopen(path, "a");
+        char *command = concat_array(args);
+        fprintf(f, "[%d] %s\n", pid, command);
+        fclose(f);
+        printf("[%d]\t%d\n", count_lines(path), pid);
       }
       if (args[i+1] != NULL) {
         char **a_aft = arr_cpy(args, i+1, 0);
