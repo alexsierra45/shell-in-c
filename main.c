@@ -4,7 +4,7 @@
 int main(int arcg, char *argv[]) {
 
     // Empty the file background.txt
-    FILE *f = fopen("background/background.txt", "w");
+    FILE *f = fopen("background/jobs.txt", "w");
     fclose(f);
 
     loop();
