@@ -27,3 +27,30 @@ char **arr_cpy(char **arr, int i, int bool) {
   
   return a_c;
 }
+
+char* concat_array(char** array) {
+    int array_size = sizeof(array) / sizeof(char *);
+    int total_length = 0;
+    for (int i = 0; i < array_size; i++) {
+        total_length += strlen(array[i]);
+        if (i != array_size - 1) {
+            total_length++;
+        }
+    }
+
+    char* result = (char*) malloc((total_length + 1) * sizeof(char));
+
+    int index = 0;
+    for (int i = 0; i < array_size; i++) {
+        int len = strlen(array[i]);
+        memcpy(result + index, array[i], len);
+        index += len;
+        if (i != array_size - 1) {
+            result[index++] = ' ';
+        }
+    }
+
+    result[total_length] = NULL;
+
+    return result;
+}
