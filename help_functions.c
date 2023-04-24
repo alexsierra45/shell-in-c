@@ -28,6 +28,20 @@ char **arr_cpy(char **arr, int i, int bool) {
   return a_c;
 }
 
+// count lines in a file
+int count_lines(char *path) {
+    FILE *file = fopen(path, "r");
+    int lines = 0;
+    int c;
+    while ((c = fgetc(file)) != EOF) {
+        if (c == '\n') {
+            lines++;
+        }
+    }
+    fclose(file);
+    return lines;
+}
+
 // concat the elements of an array
 char* concat_array(char** array) {
     int array_size = sizeof(array) / sizeof(char *);
