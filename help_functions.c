@@ -65,7 +65,7 @@ char* concat_array(char** array) {
         }
     }
 
-    result[total_length] = NULL;
+    result[total_length] = '\0';
 
     return result;
 }
