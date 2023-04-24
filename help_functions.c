@@ -28,6 +28,7 @@ char **arr_cpy(char **arr, int i, int bool) {
   return a_c;
 }
 
+// concat the elements of an array
 char* concat_array(char** array) {
     int array_size = sizeof(array) / sizeof(char *);
     int total_length = 0;
