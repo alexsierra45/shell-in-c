@@ -171,19 +171,29 @@ int conditions(char **args, int fdin, int fdout) {
 }
 
 // Check background
-int background(char **args) {
+int background(char **args, int fdin, int fdout) {
   for (int i = 0; args[i] != NULL; i++) {
     if (strcmp(args[i], "&") == 0) {
       args[i] = NULL;
-      return 1;
+      int pid = fork();
+      if (pid == 0) {
+        execute(args, fdin, fdout);
+        exit(0);
+      }
+      if (args[i+1] != NULL) {
+        char **a_aft = arr_cpy(args, i+1, 0);
+        execute(a_aft, fdin, fdout);
+      }
+
+      return 0;
     }
   }
 
-  return 0;
+  return 1;
 }
 
-
 int (*operators[]) (char **, int, int) = {
+  &background,
   &chain,
   &chain_and,
   &chain_or,
@@ -200,14 +210,6 @@ int execute(char **args, int fdin, int fdout) {
   if (args[0] == NULL) {
     printf("An empty command was entered, don't be a fool.\n");
     return 1;
-  }
-  // Check for background
-  if (background(args) == 1) {
-    int pid = fork();
-    if (pid == 0) {
-      execute(args, fdin, fdout);
-    }
-    else return 1;
   }
   // Search for ;, &&, ||, conditions, |, <, >, >>, and execute them
   for (int i = 0; i < lsh_num_operators(); i++) {
