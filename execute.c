@@ -170,36 +170,60 @@ int conditions(char **args, int fdin, int fdout) {
   return 1;
 }
 
+// Check background
+int background(char **args) {
+  for (int i = 0; args[i] != NULL; i++) {
+    if (strcmp(args[i], "&") == 0) {
+      args[i] = NULL;
+      return 1;
+    }
+  }
+
+  return 0;
+}
+
+
+int (*operators[]) (char **, int, int) = {
+  &chain,
+  &chain_and,
+  &chain_or,
+  &conditions,
+  &pipes
+};
+
+int lsh_num_operators() {
+  return sizeof(operators) / sizeof(char *);
+}
+
 // Execute shell built-in or launch program.
 int execute(char **args, int fdin, int fdout) {
   if (args[0] == NULL) {
     printf("An empty command was entered, don't be a fool.\n");
     return 1;
   }
+  // Check for background
+  if (background(args) == 1) {
+    int pid = fork();
+    if (pid == 0) {
+      execute(args, fdin, fdout);
+    }
+    else return 1;
+  }
   // Search for ;, &&, ||, conditions, |, <, >, >>, and execute them
-  if (chain(args, fdin, fdout) != 0) {
-    if (chain_and(args, fdin, fdout) != 0) {
-      if (chain_or(args, fdin, fdout) != 0) {
-        if (conditions(args, fdin, fdout) != 0) {
-          if (pipes(args, fdin, fdout) != 0) {
-            for (int i = 0; i < lsh_num_builtins(); i++) {
-              if (strcmp(args[0], builtin_str[i]) == 0) {
-                return (*builtin_func[i])(args);
-              }
-            }
-
-            int pid = fork();
-            if (pid == 0) {
-              shell_launch(args, fdin, fdout);
-            }
-            else wait(NULL);
-
-            return 1;
-          }
-        }
-      }
+  for (int i = 0; i < lsh_num_operators(); i++) {
+    if ((*operators[i])(args, fdin, fdout) == 0) 
+      return 1;
+  }
+  for (int i = 0; i < lsh_num_builtins(); i++) {
+    if (strcmp(args[0], builtin_str[i]) == 0) {
+      return (*builtin_func[i])(args);
     }
   }
+  int pid = fork();
+  if (pid == 0) {
+    shell_launch(args, fdin, fdout);
+  }
+  else wait(NULL);
   
   return 1;
 }
