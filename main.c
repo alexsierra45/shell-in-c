@@ -12,6 +12,16 @@ void init() {
     }
     else 
         fclose(fh);
+        
+    // Clear the screen
+    char *args[2] = {"clear", NULL};
+    int pid = fork();
+    if (pid == 0) {
+        execvp(args[0], args);
+        exit(0);
+    }
+    else wait(NULL);
+    printf("Welcome to my shell!\n");
 }
 
 int main(int arcg, char *argv[]) {
