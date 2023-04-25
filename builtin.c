@@ -171,23 +171,37 @@ int shell_jobs(char **args) {
 
 // Foreground builtin command.
 int shell_fg(char **args) {
-  FILE *fr = fopen("background/jobs.txt", "r");
+  FILE *f = fopen("background/jobs.txt", "r");
   char line[100];
-  char *n_line;
+  int pid, w;
+
   if (args[1] == NULL) {
-    while (fgets(line, 100, fr) != NULL && strlen(line) > 0) 
+    char *n_line;
+    while (fgets(line, 100, f) != NULL && strlen(line) > 0) 
       n_line = sub_str(line, 0, strlen(line) - 1);
-    
-    int pid = atoi(get_pid(n_line)), w;
-    if (waitpid(pid, NULL, WNOHANG) == 0) {
+    pid = atoi(get_pid(n_line));    
+  }
+  else {
+    int bool = 0;
+    pid = atoi(args[1]);
+    while (fgets(line, 100, f) != NULL && strlen(line) > 0) {
+      if (pid == atoi(get_pid(line)))
+        bool = 1;
+      if (bool != 1) {
+        printf("The process is not in the background\n");
+        return 1;
+      }
+    }
+  }
+
+  if (waitpid(pid, NULL, WNOHANG) == 0) {
       do {
         w = waitpid(pid, NULL, WNOHANG);
       } while (w == 0);
-    }
   }
-  else {
-
-  }
+  else printf("Process finished in background\n");
+  
+  fclose(f);
 
   return 1;
 }
