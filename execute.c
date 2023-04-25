@@ -208,7 +208,61 @@ int background(char **args, int fdin, int fdout) {
   return 1;
 }
 
+// Check set
+int set(char **args, int fdin, int fdout) {
+  char buffer[1024];
+
+  if (strcmp(args[0], "set") == 0) {
+    if (args[1] == NULL || args[2] == NULL) {
+      printf("set: not enough arguments\n");
+      return 0;
+    }
+    else {
+      int last = 2;
+      char **a = arr_cpy(args, 2, 0);
+      while (args[last+1] != NULL) last++;
+      if (args[2][0] == '`' && args[last][strlen(args[last])-1] == '`') {
+        if (last == 2) 
+          a[0] = sub_str(a[0], 1, strlen(a[0])-2);
+        else {
+          a[0] = sub_str(a[0], 1, strlen(a[0])-1);
+          a[last-2] = sub_str(a[last-2], 0, strlen(a[last-2])-2);
+        }
+
+        char *output_dir = home_dir("output.txt");
+        int fd = open(output_dir, O_CREAT | O_WRONLY | O_TRUNC, 0644);
+        execute(a, fdin, fd);
+        close(fd);
+        fd = open(output_dir, O_RDONLY);
+        read(fd, buffer, 1024);
+        buffer[count_chars(output_dir)] = '*';
+        buffer[count_chars(output_dir)+1] = '\0';
+        close(fd);
+      }
+      else {
+        char *command = concat_array(a, ' ');
+        for (int i = 0; i < strlen(command); i++)
+          buffer[i] = command[i];
+        buffer[strlen(command)] = '\n';
+        buffer[strlen(command)+1] = '*';
+        buffer[strlen(command)+2] = '\0';
+      }
+
+      char *var = args[1];
+      delete_var(var);
+      FILE *f = fopen(home_dir("variables.txt"), "a");
+      fprintf(f, "%s = %s\n", var, buffer);
+      fclose(f);
+
+      return 0;
+    }
+  }
+
+  return 1;
+}
+
 int (*operators[]) (char **, int, int) = {
+  &set,
   &background,
   &chain,
   &chain_and,
