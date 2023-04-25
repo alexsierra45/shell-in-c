@@ -182,6 +182,28 @@ void manage_ctrl_c(int signal) {
     count++;
 }
 
+void manage_history(char **args) {
+    int c_lines = count_lines("history/history.txt");
+    char *command = concat_array(args);
+    FILE *f = fopen("history/history.txt", "r");
+    char *lines[9];
+
+    if (c_lines == 10) {
+        char line[128];
+        fgets(line, 128, f);
+        for (int i = 0; i < 9; i++) {
+            fgets(line, 128, f);
+            lines[i] = sub_str(line, 0, strlen(line) - 1);
+        } 
+        f = fopen("history/history.txt", "w");
+        for (int i = 0; i < 9; i++) 
+            fprintf(f, "%s\n", lines[i]);
+    } 
+    f = fopen("history/history.txt", "a");
+    fprintf(f, "%s\n", command);
+    fclose(f);
+}
+
 void loop() {
   char *line;
   char **args;

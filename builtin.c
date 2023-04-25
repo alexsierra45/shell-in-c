@@ -5,6 +5,7 @@
 #include <sys/wait.h>
 #include <fcntl.h>
 #include <dirent.h>
+#include "help_functions.c"
 
 // Function Declarations for builtin shell commands:
 int shell_cd(char **args);
@@ -14,26 +15,6 @@ int shell_true(char **args);
 int shell_false(char **args);
 int shell_jobs(char **args);
 int shell_fg(char ** args);
-
-char *sub_str(char *line, int init, int end) {
-  char *new_line = (char *) malloc(end - init + 1);
-
-  int i;
-  for (i = 0; i < end - init + 1; i++) {
-      new_line[i] = line[i + init];
-  }
-  new_line[i] = 0;
-
-  return new_line;
-}
-
-char *get_pid(char *line) {
-  int i;
-  for (i = 0; i < strlen(line); i++) {
-    if (line[i] == ' ') break;
-  }
-  return sub_str(line, 0, i-1);
-}
 
 // List of builtin commands, followed by their corresponding functions.
 char *builtin_str[] = {

@@ -5,7 +5,6 @@
 #include <sys/wait.h>
 #include <fcntl.h>
 #include "builtin.c"
-#include "help_functions.c"
 
 int execute(char **args, int fdin, int fdout);
 

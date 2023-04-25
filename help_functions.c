@@ -84,3 +84,12 @@ char *sub_str(char *line, int init, int end) {
 
   return new_line;
 }
+
+// return the pid of a process
+char *get_pid(char *line) {
+  int i;
+  for (i = 0; i < strlen(line); i++) {
+    if (line[i] == ' ') break;
+  }
+  return sub_str(line, 0, i-1);
+}
