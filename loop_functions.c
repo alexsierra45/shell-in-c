@@ -172,10 +172,6 @@ char **split_line(char *line) {
     token = strtok(NULL, LSH_TOK_DELIM);
   }
   tokens[position] = NULL;
-  if (strcmp(tokens[0], "again") == 0) {
-    char *args[3] = {tokens[0], tokens[1], NULL};
-    tokens = shell_again(args);
-  }
   return tokens;
 }
 
@@ -186,6 +182,10 @@ void manage_ctrl_c(int signal) {
 }
 
 void write_history(char **args) {
+    if (strcmp(args[0], "again") == 0) {
+        char *a[3] = {args[0], args[1], NULL};
+        args = shell_again(a);
+    }
     char *history_dir = home_dir("history.txt");
     int c_lines = count_lines(history_dir);
     char *command = concat_array(args, ' ');

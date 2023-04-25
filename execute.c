@@ -292,6 +292,10 @@ int lsh_num_operators() {
 
 // Execute shell built-in or launch program.
 int execute(char **args, int fdin, int fdout, int master) {
+  if (strcmp(args[0], "again") == 0) {
+    char *a[3] = {args[0], args[1], NULL};
+    args = shell_again(a);
+  }
   if (args[0] == NULL) {
     printf("An empty command was entered, don't be a fool.\n");
     return -1;
