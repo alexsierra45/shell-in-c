@@ -15,6 +15,7 @@ int shell_true(char **args);
 int shell_false(char **args);
 int shell_jobs(char **args);
 int shell_fg(char ** args);
+int shell_history(char **args);
 
 // List of builtin commands, followed by their corresponding functions.
 char *builtin_str[] = {
@@ -198,7 +199,7 @@ int shell_history(char **args) {
   int line_count = 1;
 
   while (fgets(line, 100, fr) != NULL && strlen(line) > 0) {
-    printf("%d\t%s", line_count, line);
+    printf("%d: %s", line_count, line);
     line_count++;
   }
   fclose(fr);
