@@ -25,6 +25,7 @@ char *builtin_str[] = {
   "false",
   "jobs",
   "fg",
+  "history"
 };
 
 int (*builtin_func[]) (char **) = {
@@ -34,7 +35,8 @@ int (*builtin_func[]) (char **) = {
   &shell_true, 
   &shell_false,
   &shell_jobs,
-  &shell_fg
+  &shell_fg,
+  &shell_history
 };
 
 int lsh_num_builtins() {
@@ -184,6 +186,22 @@ int shell_fg(char **args) {
   else printf("Process finished in background\n");
   
   fclose(f);
+
+  return 1;
+}
+
+// History builtin command
+int shell_history(char **args) {
+  char *history_dir = home_dir("history.txt");
+  FILE *fr = fopen(history_dir, "r");
+  char line[100];
+  int line_count = 1;
+
+  while (fgets(line, 100, fr) != NULL && strlen(line) > 0) {
+    printf("%d\t%s", line_count, line);
+    line_count++;
+  }
+  fclose(fr);
 
   return 1;
 }
