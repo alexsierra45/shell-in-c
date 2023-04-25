@@ -177,7 +177,6 @@ char **split_line(char *line) {
 
 void manage_ctrl_c(int signal) {
     printf("\n");
-    exit(signal);
 }
 
 
