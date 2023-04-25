@@ -198,7 +198,8 @@ void write_history(char **args) {
         } 
         f = fopen(history_dir, "w");
         for (int i = 0; i < 9; i++) 
-            fprintf(f, "%s\n", lines[i]);
+            fprintf(f, "%s", lines[i]);
+        fclose(f);
     } 
     f = fopen(history_dir, "a");
     fprintf(f, "%s\n", command);

@@ -14,7 +14,8 @@ int shell_launch(char **args, int fdin, int fdout) {
   dup2(fdout, 1);
   
   if (execvp(args[0], args) == -1) {
-    perror("lsh");
+    printf("Command not found\n");
+    return -1;
   }
 }
 
@@ -228,7 +229,7 @@ int execute(char **args, int fdin, int fdout) {
     printf("An empty command was entered, don't be a fool.\n");
     return -1;
   }
-  // Search for ;, &&, ||, conditions, |, <, >, >>, and execute them
+  // Search for &, ;, &&, ||, conditions, |, <, >, >>, and execute them
   for (int i = 0; i < lsh_num_operators(); i++) {
     if ((*operators[i])(args, fdin, fdout) == 0) 
       return 1;
@@ -240,9 +241,18 @@ int execute(char **args, int fdin, int fdout) {
   }
   int pid = fork();
   if (pid == 0) {
-    shell_launch(args, fdin, fdout);
+    if (shell_launch(args, fdin, fdout) == -1)
+      exit(-1);
   }
-  else wait(NULL);
+  else {
+    int status;
+    wait(&status);
+    if (WIFEXITED(status)) {
+      int exit_status = WEXITSTATUS(status);
+      if (exit_status == 255) 
+        return -1;
+    }
+  }
   
   return 1;
 }
