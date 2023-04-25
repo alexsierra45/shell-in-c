@@ -186,15 +186,15 @@ int background(char **args, int fdin, int fdout) {
         char *path = "background/jobs.txt";
         FILE *f = fopen(path, "a");
         char *command = concat_array(args);
-        fprintf(f, "[%d] %s\n", pid, command);
+        fprintf(f, "%d %s\n", pid, command);
         fclose(f);
         printf("[%d]\t%d\n", count_lines(path), pid);
+        if (args[i+1] != NULL) {
+          char **a_aft = arr_cpy(args, i+1, 0);
+          execute(a_aft, fdin, fdout);
+        }
       }
-      if (args[i+1] != NULL) {
-        char **a_aft = arr_cpy(args, i+1, 0);
-        execute(a_aft, fdin, fdout);
-      }
-
+      
       return 0;
     }
   }
