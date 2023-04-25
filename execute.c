@@ -276,9 +276,9 @@ int (*operators[]) (char **, int, int) = {
   &set,
   &background,
   &chain,
+  &conditions,
   &chain_and,
   &chain_or,
-  &conditions,
   &pipes,
   &red_in,
   &red_out
