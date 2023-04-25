@@ -76,7 +76,7 @@ int shell_help(char **args) {
     close(fd);
   }
   else {
-    char *cmd_name = args[1];
+    char *cmd_name = sub_str(args[1], 0, strlen(args[1]) - 1);
     char help[100] = "help/";
     char *new_str = strcat(help, strcat(cmd_name, ".txt"));
     int fd = open(new_str, O_RDONLY);
