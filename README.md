@@ -12,3 +12,5 @@ gcc -o main main.c
 - chain
 - if
 - help
+- ctrl+c
+- background
