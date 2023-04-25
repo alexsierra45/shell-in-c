@@ -71,3 +71,16 @@ char* concat_array(char** array) {
 
   return result;
 }
+
+// return a substring
+char *sub_str(char *line, int init, int end) {
+  char *new_line = (char *) malloc(end - init + 1);
+
+  int i;
+  for (i = 0; i < end - init + 1; i++) {
+      new_line[i] = line[i + init];
+  }
+  new_line[i] = 0;
+
+  return new_line;
+}
