@@ -43,7 +43,7 @@ int count_lines(char *path) {
 }
 
 // concat the elements of an array
-char* concat_array(char** array) {
+char* concat_array(char** array, char separator) {
   int array_size = 0;
   while (array[array_size] != NULL)
     array_size++;
@@ -63,7 +63,7 @@ char* concat_array(char** array) {
       memcpy(result + index, array[i], len);
       index += len;
       if (i != array_size - 1) {
-          result[index++] = ' ';
+          result[index++] = separator;
       }
   }
 
@@ -92,4 +92,11 @@ char *get_pid(char *line) {
     if (line[i] == ' ') break;
   }
   return sub_str(line, 0, i-1);
+}
+
+// return a direction at home 
+char *home_dir(char *file_name) {
+  char *home_dir = getenv("HOME");
+  char *dir[3] = {home_dir, file_name, NULL};
+  return concat_array(dir, '/');
 }

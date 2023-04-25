@@ -183,9 +183,10 @@ void manage_ctrl_c(int signal) {
 }
 
 void write_history(char **args) {
-    int c_lines = count_lines("history/history.txt");
-    char *command = concat_array(args);
-    FILE *f = fopen("history/history.txt", "r");
+    char *history_dir = home_dir("history.txt");
+    int c_lines = count_lines(history_dir);
+    char *command = concat_array(args, ' ');
+    FILE *f = fopen(history_dir, "r");
     char *lines[9];
 
     if (c_lines == 10) {
@@ -195,11 +196,11 @@ void write_history(char **args) {
             fgets(line, 128, f);
             lines[i] = sub_str(line, 0, strlen(line) - 1);
         } 
-        f = fopen("history/history.txt", "w");
+        f = fopen(history_dir, "w");
         for (int i = 0; i < 9; i++) 
             fprintf(f, "%s\n", lines[i]);
     } 
-    f = fopen("history/history.txt", "a");
+    f = fopen(history_dir, "a");
     fprintf(f, "%s\n", command);
     fclose(f);
 }

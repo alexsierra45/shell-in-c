@@ -188,9 +188,9 @@ int background(char **args, int fdin, int fdout) {
       }
       if (pid > 0) {
         setpgid(pid, pid);
-        char *path = "background/jobs.txt";
+        char *path = home_dir("jobs.txt");
         FILE *f = fopen(path, "a");
-        char *command = concat_array(args);
+        char *command = concat_array(args, ' ');
         fprintf(f, "%d %s\n", pid, command);
         fclose(f);
         printf("[%d]\t%d\n", count_lines(path), pid);

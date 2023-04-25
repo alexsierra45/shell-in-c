@@ -118,7 +118,8 @@ int shell_false(char **args) {
 
 // Jobs builtin command.
 int shell_jobs(char **args) {
-  FILE *fr = fopen("background/jobs.txt", "r");
+  char *jobs_dir = home_dir("jobs.txt");
+  FILE *fr = fopen(jobs_dir, "r");
   char line[100];
   int line_count = 1;
   int bufsize = 64;
@@ -142,7 +143,7 @@ int shell_jobs(char **args) {
   }
   running_jobs[index] = NULL;
   fclose(fr);
-  FILE *fw = fopen("background/jobs.txt", "w");
+  FILE *fw = fopen(jobs_dir, "w");
   for (int i = 0; running_jobs[i] != NULL; i++) 
     fprintf(fw, "%s", running_jobs[i]);
   fclose(fw);
@@ -152,7 +153,7 @@ int shell_jobs(char **args) {
 
 // Foreground builtin command.
 int shell_fg(char **args) {
-  FILE *f = fopen("background/jobs.txt", "r");
+  FILE *f = fopen(home_dir("jobs.txt"), "r");
   char line[100];
   int pid, w;
 
