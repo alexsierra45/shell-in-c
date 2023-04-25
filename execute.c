@@ -11,20 +11,9 @@ int execute(char **args, int fdin, int fdout);
 
 // Launch a program.
 int shell_launch(char **args, int fdin, int fdout) {
-  int in = dup(0);
-  int out = dup(1);
   dup2(fdin, 0);
   dup2(fdout, 1);
-  int redout = check_red_out(args);
-  if (redout != 0) {
-    args[abs(redout)] = NULL;
-    int fd;
-    if (redout > 0) fd = open(args[redout+1], O_RDWR | O_CREAT, 0644);
-    else fd = open(args[-redout+1], O_RDWR | O_CREAT | O_APPEND, 0644);
-    dup2(fd, 1);
-    close(fd);
-  }
-
+  
   if (execvp(args[0], args) == -1) {
     perror("lsh");
   }
@@ -36,7 +25,7 @@ int red_in(char **args, int fdin, int fdout) {
     if (strcmp(args[i], "<") == 0) {
       args[i] = NULL;
       int fd = open(args[i+1], O_RDWR | O_CREAT, 0644);
-      xecute(args, fd, fdout);
+      execute(args, fd, fdout);
       
       return 0;
     }
@@ -46,13 +35,31 @@ int red_in(char **args, int fdin, int fdout) {
 }
 
 // Check > or >> value in args
-int check_red_out(char **args) {
+int red_out(char **args, int fdin, int fdout) {
   for (int i = 0; args[i] != NULL; i++) {
-    if (strcmp(args[i], ">") == 0) return i;
-    else if (strcmp(args[i], ">>") == 0) return -i;
+    if (strcmp(args[i], ">") == 0) {
+      if (i == 0) {
+        FILE *f = fopen(args[1], "w");
+        fclose(f);
+      }
+      else {
+        args[i] = NULL;
+        int fd = open(args[i+1], O_RDWR | O_CREAT, 0644);
+        execute(args, fdin, fd);
+      }
+      
+      return 0;
+    }
+    else if (strcmp(args[i], ">>") == 0) {
+      args[i] = NULL;
+      int fd = open(args[i+1], O_RDWR | O_CREAT | O_APPEND, 0644);
+      execute(args, fdin, fd);
+
+      return 0;
+    }
   }
 
-  return 0;
+  return 1;
 }
 
 // Check pipes
@@ -208,7 +215,8 @@ int (*operators[]) (char **, int, int) = {
   &chain_or,
   &conditions,
   &pipes,
-  &red_in
+  &red_in,
+  &red_out
 };
 
 int lsh_num_operators() {
@@ -217,8 +225,6 @@ int lsh_num_operators() {
 
 // Execute shell built-in or launch program.
 int execute(char **args, int fdin, int fdout) {
-  int in = dup(fdin);
-  int out = dup(fdout);
   if (args[0] == NULL) {
     printf("An empty command was entered, don't be a fool.\n");
     return 1;
@@ -237,13 +243,7 @@ int execute(char **args, int fdin, int fdout) {
   if (pid == 0) {
     shell_launch(args, fdin, fdout);
   }
-  else {
-    wait(NULL);
-    // dup2(in, fdin);
-    // dup2(out, fdout);
-    // close(in);
-    // close(out);
-  }
+  else wait(NULL);
   
   return 1;
 }
