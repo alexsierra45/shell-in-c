@@ -224,6 +224,7 @@ void loop() {
     line = read_line();
     args = split_line(line);
     status = execute(args, 0, 1, 1);
+    count = 0;
     if (status != -1)
         write_history(args);
     free(line);
