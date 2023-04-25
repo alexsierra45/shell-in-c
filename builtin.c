@@ -13,6 +13,7 @@ int shell_exit(char **args);
 int shell_true(char **args);
 int shell_false(char **args);
 int shell_jobs(char **args);
+int shell_fg(char ** args);
 
 char *sub_str(char *line, int init, int end) {
   char *new_line = (char *) malloc(end - init + 1);
@@ -42,6 +43,7 @@ char *builtin_str[] = {
   "true",
   "false",
   "jobs",
+  "fg",
 };
 
 int (*builtin_func[]) (char **) = {
@@ -50,7 +52,8 @@ int (*builtin_func[]) (char **) = {
   &shell_exit, 
   &shell_true, 
   &shell_false,
-  &shell_jobs
+  &shell_jobs,
+  &shell_fg
 };
 
 int lsh_num_builtins() {
@@ -59,7 +62,7 @@ int lsh_num_builtins() {
 
 // Builtin function implementations.
 
-// Change directory.
+// Change directory bultin command.
 int shell_cd(char **args) {
   if (args[1] == NULL) {
     char *home_dir = getenv("HOME");
@@ -162,6 +165,29 @@ int shell_jobs(char **args) {
   for (int i = 0; running_jobs[i] != NULL; i++) 
     fprintf(fw, "%s", running_jobs[i]);
   fclose(fw);
+
+  return 1;
+}
+
+// Foreground builtin command.
+int shell_fg(char **args) {
+  FILE *fr = fopen("background/jobs.txt", "r");
+  char line[100];
+  char *n_line;
+  if (args[1] == NULL) {
+    while (fgets(line, 100, fr) != NULL && strlen(line) > 0) 
+      n_line = sub_str(line, 0, strlen(line) - 1);
+    
+    int pid = atoi(get_pid(n_line)), w;
+    if (waitpid(pid, NULL, WNOHANG) == 0) {
+      do {
+        w = waitpid(pid, NULL, WNOHANG);
+      } while (w == 0);
+    }
+  }
+  else {
+
+  }
 
   return 1;
 }
