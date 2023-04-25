@@ -42,6 +42,18 @@ int count_lines(char *path) {
     return lines;
 }
 
+// count chars in a file
+int count_chars(char *path) {
+    FILE *file = fopen(path, "r");
+    int chars = 0;
+    int c;
+    while ((c = fgetc(file)) != EOF) {
+        chars++;
+    }
+    fclose(file);
+    return chars;
+}
+
 // concat the elements of an array
 char* concat_array(char** array, char separator) {
   int array_size = 0;
@@ -99,4 +111,34 @@ char *home_dir(char *file_name) {
   char *home_dir = getenv("HOME");
   char *dir[3] = {home_dir, file_name, NULL};
   return concat_array(dir, '/');
+}
+
+// delete a variable
+void delete_var(char *var) {
+  char *var_dir = home_dir("variables.txt");
+  FILE *f = fopen(var_dir, "r");
+  char *lines[100];
+  char line[128];
+  int i = 0;
+  while (fgets(line, 128, f) != NULL) {
+    int index = 0;
+    while (line[index] != '\n' && line[index] != '=') index++;
+    if (line[index] == '=') {
+      char *v = sub_str(line, 0, index - 2);
+      if (strcmp(v, var) == 0) {
+        do 
+          fgets(line, 128, f);
+        while(line[0] != '*');
+        continue;
+      }
+    }
+    lines[i] = sub_str(line, 0, strlen(line) - 1);
+    i++;
+  }
+  fclose(f);
+  f = fopen(var_dir, "w");
+  for (int j = 0; j < i; j++) {
+    fprintf(f, "%s", lines[j]);
+  }
+  fclose(f);
 }
