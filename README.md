@@ -15,3 +15,4 @@ gcc -o main main.c
 - ctrl+c
 - background
 - history
+- variables
