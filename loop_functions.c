@@ -13,7 +13,6 @@
 #define GREEN "\033[1;32m"
 
 int count = 0;
-void loop();
 
 char *read_line(void) {
   char *line = NULL;
@@ -224,7 +223,7 @@ void loop() {
     printf("%smyshell@%s%s:%s~%s%s$ ", GREEN, pw->pw_name, RESET, BLUE, cwd, RESET);
     line = read_line();
     args = split_line(line);
-    status = execute(args, 0, 1);
+    status = execute(args, 0, 1, 1);
     if (status != -1)
         write_history(args);
     free(line);

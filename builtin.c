@@ -10,7 +10,6 @@
 // Function Declarations for builtin shell commands:
 int shell_cd(char **args);
 int shell_help(char **args);
-int shell_exit(char **args);
 int shell_true(char **args);
 int shell_false(char **args);
 int shell_jobs(char **args);
@@ -23,7 +22,6 @@ int shell_get(char **args);
 char *builtin_str[] = {
   "cd",
   "help",
-  "exit",
   "true",
   "false",
   "jobs",
@@ -36,7 +34,6 @@ char *builtin_str[] = {
 int (*builtin_func[]) (char **) = {
   &shell_cd,
   &shell_help,
-  &shell_exit, 
   &shell_true, 
   &shell_false,
   &shell_jobs,
@@ -108,11 +105,6 @@ int shell_help(char **args) {
   }
 
   return 1;
-}
-
-// Exit builtin command.
-int shell_exit(char **args) {
-  return 0;
 }
 
 // True builtin command.

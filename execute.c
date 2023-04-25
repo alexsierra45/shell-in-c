@@ -6,7 +6,7 @@
 #include <fcntl.h>
 #include "builtin.c"
 
-int execute(char **args, int fdin, int fdout);
+int execute(char **args, int fdin, int fdout, int master);
 
 // Launch a program.
 int shell_launch(char **args, int fdin, int fdout) {
@@ -25,13 +25,13 @@ int red_in(char **args, int fdin, int fdout) {
     if (strcmp(args[i], "<") == 0) {
       args[i] = NULL;
       int fd = open(args[i+1], O_RDWR | O_CREAT, 0644);
-      execute(args, fd, fdout);
+      execute(args, fd, fdout, 0);
       
       return 0;
     }
   }
 
-  return 1;
+  return -1;
 }
 
 // Check > or >> value in args
@@ -45,7 +45,7 @@ int red_out(char **args, int fdin, int fdout) {
       else {
         args[i] = NULL;
         int fd = open(args[i+1], O_RDWR | O_CREAT, 0644);
-        execute(args, fdin, fd);
+        execute(args, fdin, fd, 0);
       }
       
       return 0;
@@ -53,13 +53,13 @@ int red_out(char **args, int fdin, int fdout) {
     else if (strcmp(args[i], ">>") == 0) {
       args[i] = NULL;
       int fd = open(args[i+1], O_RDWR | O_CREAT | O_APPEND, 0644);
-      execute(args, fdin, fd);
+      execute(args, fdin, fd, 0);
 
       return 0;
     }
   }
 
-  return 1;
+  return -1;
 }
 
 // Check pipes
@@ -82,7 +82,7 @@ int pipes(char **args, int fdin, int fdout) {
       } else {
         wait(NULL);
         close(fd[1]);
-        execute(a_aft, fd[0], fdout);
+        execute(a_aft, fd[0], fdout, 0);
         close(fd[0]);
       }
 
@@ -95,7 +95,7 @@ int pipes(char **args, int fdin, int fdout) {
     }
   }
 
-  return 1;
+  return -1;
 }
 
 // Chain commands
@@ -106,13 +106,13 @@ int chain(char **args, int fdin, int fdout) {
     if (strcmp(args[i], ";") == 0) {
       char **a_bef = arr_cpy(args, i, 1);
       char **a_aft = arr_cpy(args, i+1, 0);
-      execute(a_bef, fdin, fdout);
-      execute(a_aft, fdin, fdout);
+      execute(a_bef, fdin, fdout, 0);
+      execute(a_aft, fdin, fdout, 0);
       return 0;
     }
   }
 
-  return 1;
+  return -1;
 }
 
 // Chain &&
@@ -121,12 +121,13 @@ int chain_and(char **args, int fdin, int fdout) {
     if (strcmp(args[i], "&&") == 0) {
       char **a_bef = arr_cpy(args, i, 1);
       char **a_aft = arr_cpy(args, i+1, 0);
-      if (execute(a_bef, fdin, fdout) == 0) execute(a_aft, fdin, fdout);
-      return 0;
+      if (execute(a_bef, fdin, fdout, 0) == 0 && execute(a_aft, fdin, fdout, 0) == 0)
+        return 0;
+      return 1;
     }
   }
 
-  return 1;
+  return -1;
 }
 
 // Chain ||
@@ -135,12 +136,13 @@ int chain_or(char **args, int fdin, int fdout) {
     if (strcmp(args[i], "||") == 0) {
       char **a_bef = arr_cpy(args, i, 1);
       char **a_aft = arr_cpy(args, i+1, 0);
-      if (execute(a_bef, fdin, fdout) != 0) execute(a_aft, fdin, fdout);
-      return 0;
+      if (execute(a_bef, fdin, fdout, 0) == 0 || execute(a_aft, fdin, fdout, 0) == 0)
+        return 0;
+      return 1;
     }
   }
 
-  return 1;
+  return -1;
 }
 
 // Conditional execution
@@ -157,7 +159,7 @@ int conditions(char **args, int fdin, int fdout) {
       i++;
       if (args[i] == NULL) {
         char **a_then = arr_cpy(args, i-1, 1);
-        if (execute(a_if, fdin, fdout) == 0) execute(a_then, fdin, fdout);
+        if (execute(a_if, fdin, fdout, 0) == 0) execute(a_then, fdin, fdout, 0);
 
         return 0;
       }
@@ -167,13 +169,13 @@ int conditions(char **args, int fdin, int fdout) {
     i = 0;
     while (strcmp(args[i], "end") != 0) i++;
     char **a_else = arr_cpy(args, i, 1);
-    if (execute(a_if, fdin, fdout) == 0) execute(a_then, fdin, fdout);
-    else execute(a_else, fdin, fdout);
+    if (execute(a_if, fdin, fdout, 0) == 0) execute(a_then, fdin, fdout, 0);
+    else execute(a_else, fdin, fdout, 0);
 
     return 0;
   }
 
-  return 1;
+  return -1;
 }
 
 // Check background
@@ -184,7 +186,7 @@ int background(char **args, int fdin, int fdout) {
       int pid = fork();
       if (pid == 0) {
         setpgid(0, 0);
-        execute(args, fdin, fdout);
+        execute(args, fdin, fdout, 0);
         exit(0);
       }
       if (pid > 0) {
@@ -197,7 +199,7 @@ int background(char **args, int fdin, int fdout) {
         printf("[%d]\t%d\n", count_lines(path), pid);
         if (args[i+1] != NULL) {
           char **a_aft = arr_cpy(args, i+1, 0);
-          execute(a_aft, fdin, fdout);
+          execute(a_aft, fdin, fdout, 0);
         }
       }
       
@@ -205,7 +207,7 @@ int background(char **args, int fdin, int fdout) {
     }
   }
 
-  return 1;
+  return -1;
 }
 
 // Check set
@@ -242,7 +244,7 @@ int set(char **args, int fdin, int fdout) {
 
         char *output_dir = home_dir("output.txt");
         int fd = open(output_dir, O_CREAT | O_WRONLY | O_TRUNC, 0644);
-        execute(a, fdin, fd);
+        execute(a, fdin, fd, 0);
         close(fd);
         fd = open(output_dir, O_RDONLY);
         read(fd, buffer, 1024);
@@ -269,7 +271,7 @@ int set(char **args, int fdin, int fdout) {
     }
   }
 
-  return 1;
+  return -1;
 }
 
 int (*operators[]) (char **, int, int) = {
@@ -289,20 +291,23 @@ int lsh_num_operators() {
 }
 
 // Execute shell built-in or launch program.
-int execute(char **args, int fdin, int fdout) {
+int execute(char **args, int fdin, int fdout, int master) {
   if (args[0] == NULL) {
     printf("An empty command was entered, don't be a fool.\n");
     return -1;
   }
-  // Search for &, ;, &&, ||, conditions, |, <, >, >>, and execute them
+  // Search for set, &, ;, &&, ||, conditions, |, <, >, >>, and execute them
   for (int i = 0; i < lsh_num_operators(); i++) {
-    if ((*operators[i])(args, fdin, fdout) == 0) 
-      return 1;
+    int result = (*operators[i])(args, fdin, fdout);
+    if (result != -1) 
+      return master ? 1 : result;
   }
   for (int i = 0; i < lsh_num_builtins(); i++) {
     if (strcmp(args[0], builtin_str[i]) == 0) {
-      return (*builtin_func[i])(args);
+      int result = (*builtin_func[i])(args);
+      return master ? 1 : result;
     }
+    if (strcmp(args[0], "exit") == 0) return 0;
   }
   int pid = fork();
   if (pid == 0) {
@@ -319,5 +324,5 @@ int execute(char **args, int fdin, int fdout) {
     }
   }
   
-  return 1;
+  return master ? 1 : 0;
 }
