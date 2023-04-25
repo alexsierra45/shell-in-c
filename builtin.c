@@ -16,6 +16,7 @@ int shell_false(char **args);
 int shell_jobs(char **args);
 int shell_fg(char ** args);
 int shell_history(char **args);
+int shell_unset(char **args);
 
 // List of builtin commands, followed by their corresponding functions.
 char *builtin_str[] = {
@@ -26,7 +27,8 @@ char *builtin_str[] = {
   "false",
   "jobs",
   "fg",
-  "history"
+  "history",
+  "unset"
 };
 
 int (*builtin_func[]) (char **) = {
@@ -37,7 +39,8 @@ int (*builtin_func[]) (char **) = {
   &shell_false,
   &shell_jobs,
   &shell_fg,
-  &shell_history
+  &shell_history,
+  &shell_unset
 };
 
 int lsh_num_builtins() {
@@ -234,4 +237,18 @@ char **shell_again(char **args) {
   fclose(fr);
 
   return NULL;
+}
+
+// Unset bultin command
+int shell_unset(char **args) {
+  if (args[1] == NULL) {
+    printf("unset: not enough arguments\n");
+    return 1;
+  }
+  else {
+    char *var = args[1];
+    delete_var(var);
+  }
+
+  return 1;
 }
