@@ -211,9 +211,20 @@ int background(char **args, int fdin, int fdout) {
 // Check set
 int set(char **args, int fdin, int fdout) {
   char buffer[1024];
+  char *var_dir = home_dir("variables.txt");
 
   if (strcmp(args[0], "set") == 0) {
-    if (args[1] == NULL || args[2] == NULL) {
+    if (args[1] == NULL) {
+      FILE *f = fopen(var_dir, "r");
+      char line[128];
+      while (fgets(line, 128, f) != NULL) {
+        if (line[0] == '*') continue;
+        printf("%s", line);
+      }
+
+      return 0;
+    }
+    else if (args[2] == NULL) {
       printf("set: not enough arguments\n");
       return 0;
     }
@@ -250,7 +261,7 @@ int set(char **args, int fdin, int fdout) {
 
       char *var = args[1];
       delete_var(var);
-      FILE *f = fopen(home_dir("variables.txt"), "a");
+      FILE *f = fopen(var_dir, "a");
       fprintf(f, "%s = %s\n", var, buffer);
       fclose(f);
 
