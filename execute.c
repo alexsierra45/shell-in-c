@@ -226,7 +226,7 @@ int lsh_num_operators() {
 int execute(char **args, int fdin, int fdout) {
   if (args[0] == NULL) {
     printf("An empty command was entered, don't be a fool.\n");
-    return 1;
+    return -1;
   }
   // Search for ;, &&, ||, conditions, |, <, >, >>, and execute them
   for (int i = 0; i < lsh_num_operators(); i++) {

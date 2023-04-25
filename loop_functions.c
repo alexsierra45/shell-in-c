@@ -182,7 +182,7 @@ void manage_ctrl_c(int signal) {
     count++;
 }
 
-void manage_history(char **args) {
+void write_history(char **args) {
     int c_lines = count_lines("history/history.txt");
     char *command = concat_array(args);
     FILE *f = fopen("history/history.txt", "r");
@@ -219,6 +219,8 @@ void loop() {
     line = read_line();
     args = split_line(line);
     status = execute(args, 0, 1);
+    if (status != -1)
+        write_history(args);
     free(line);
     free(args);
   }
