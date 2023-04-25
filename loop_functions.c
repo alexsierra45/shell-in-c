@@ -12,6 +12,7 @@
 #define RESET "\033[0m"
 #define GREEN "\033[1;32m"
 
+int count = 0;
 void loop();
 
 char *read_line(void) {
@@ -177,6 +178,8 @@ char **split_line(char *line) {
 
 void manage_ctrl_c(int signal) {
     printf("\n");
+    if (count) exit(signal);
+    count++;
 }
 
 void loop() {
