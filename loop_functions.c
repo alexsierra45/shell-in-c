@@ -173,6 +173,10 @@ char **split_line(char *line) {
     token = strtok(NULL, LSH_TOK_DELIM);
   }
   tokens[position] = NULL;
+  if (strcmp(tokens[0], "again") == 0) {
+    char *args[3] = {tokens[0], tokens[1], NULL};
+    tokens = shell_again(args);
+  }
   return tokens;
 }
 

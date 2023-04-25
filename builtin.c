@@ -206,3 +206,32 @@ int shell_history(char **args) {
 
   return 1;
 }
+
+// Again builtin command
+char **shell_again(char **args) {
+  char *history_dir = home_dir("history.txt");
+  FILE *fr = fopen(history_dir, "r");
+  char line[100];
+  int line_count = 1;
+  char **new_args = malloc(100 * sizeof(char *));
+  int index = 0;
+
+  while (fgets(line, 100, fr) != NULL && strlen(line) > 0) {
+    if (atoi(args[1]) == line_count) {
+      char *cmd = sub_str(line, 0, strlen(line) - 2);
+      char *token = strtok(cmd, " ");
+      while (token != NULL) {
+        new_args[index] = token;
+        token = strtok(NULL, " ");
+        index++;
+      }
+      new_args[index] = NULL;
+      fclose(fr);
+      return new_args;
+    }
+    line_count++;
+  }
+  fclose(fr);
+
+  return NULL;
+}
