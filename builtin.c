@@ -134,22 +134,34 @@ int shell_false(char **args) {
 
 // Jobs builtin command.
 int shell_jobs(char **args) {
-  FILE *f = fopen("background/jobs.txt", "r");
+  FILE *fr = fopen("background/jobs.txt", "r");
   char line[100];
   int line_count = 1;
+  int bufsize = 64;
+  char *running_jobs[100];;
+  int index = 0;
 
-  while (fgets(line, 100, f) != NULL && line[0] != ' ') {
+  while (fgets(line, 100, fr) != NULL && strlen(line) > 0) {
     char *pid = get_pid(line);
     char *cmd = sub_str(line, strlen(pid) + 1, strlen(line) - 1);
     int is_alive = waitpid(atoi(pid), NULL, WNOHANG);
 
-    if (is_alive == 0)
+    if (is_alive == 0) {
       printf("[%d] +Running\t%s", line_count, cmd);
+      running_jobs[index] = sub_str(line, 0, strlen(line) - 1);
+      index++;
+    }
     else {
       printf("[%d] -Done\t%s", line_count, cmd);
     }
     line_count++;
   }
+  running_jobs[index] = NULL;
+  fclose(fr);
+  FILE *fw = fopen("background/jobs.txt", "w");
+  for (int i = 0; running_jobs[i] != NULL; i++) 
+    fprintf(fw, "%s", running_jobs[i]);
+  fclose(fw);
 
   return 1;
 }
