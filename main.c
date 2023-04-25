@@ -3,8 +3,16 @@
 
 void init() {
     // Empty the file background.txt
-    FILE *f = fopen("background/jobs.txt", "w");
-    fclose(f);
+    FILE *fj = fopen("background/jobs.txt", "w");
+    fclose(fj);
+    // 
+    FILE *fh = fopen("history/history.txt", "r");
+    if (fh == NULL) {
+        FILE *fh = fopen("history/history.txt", "w");
+        fclose(fh);
+    }
+    else 
+        fclose(fh);
 }
 
 int main(int arcg, char *argv[]) {
