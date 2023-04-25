@@ -5,7 +5,7 @@ void init() {
     // Empty the file background.txt
     FILE *fj = fopen("background/jobs.txt", "w");
     fclose(fj);
-    // 
+    // Check for the existence of the file history.txt
     FILE *fh = fopen("history/history.txt", "r");
     if (fh == NULL) {
         FILE *fh = fopen("history/history.txt", "w");
