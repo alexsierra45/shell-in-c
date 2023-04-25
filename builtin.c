@@ -12,6 +12,8 @@ int shell_help(char **args);
 int shell_exit(char **args);
 int shell_true(char **args);
 int shell_false(char **args);
+int shell_jobs(char **args);
+int shell_fg(char ** args);
 
 char *sub_str(char *line, int init, int end) {
   char *new_line = (char *) malloc(end - init + 1);
@@ -25,13 +27,23 @@ char *sub_str(char *line, int init, int end) {
   return new_line;
 }
 
+char *get_pid(char *line) {
+  int i;
+  for (i = 0; i < strlen(line); i++) {
+    if (line[i] == ' ') break;
+  }
+  return sub_str(line, 0, i-1);
+}
+
 // List of builtin commands, followed by their corresponding functions.
 char *builtin_str[] = {
   "cd",
   "help",
   "exit",
   "true",
-  "false"
+  "false",
+  "jobs",
+  "fg",
 };
 
 int (*builtin_func[]) (char **) = {
@@ -39,7 +51,9 @@ int (*builtin_func[]) (char **) = {
   &shell_help,
   &shell_exit, 
   &shell_true, 
-  &shell_false
+  &shell_false,
+  &shell_jobs,
+  &shell_fg
 };
 
 int lsh_num_builtins() {
@@ -48,7 +62,7 @@ int lsh_num_builtins() {
 
 // Builtin function implementations.
 
-// Change directory.
+// Change directory bultin command.
 int shell_cd(char **args) {
   if (args[1] == NULL) {
     char *home_dir = getenv("HOME");
@@ -118,5 +132,76 @@ int shell_true(char **args) {
 
 // False builtin command.
 int shell_false(char **args) {
+  return 1;
+}
+
+// Jobs builtin command.
+int shell_jobs(char **args) {
+  FILE *fr = fopen("background/jobs.txt", "r");
+  char line[100];
+  int line_count = 1;
+  int bufsize = 64;
+  char *running_jobs[100];;
+  int index = 0;
+
+  while (fgets(line, 100, fr) != NULL && strlen(line) > 0) {
+    char *pid = get_pid(line);
+    char *cmd = sub_str(line, strlen(pid) + 1, strlen(line) - 1);
+    int is_alive = waitpid(atoi(pid), NULL, WNOHANG);
+
+    if (is_alive == 0) {
+      printf("[%d] +Running\t%s", line_count, cmd);
+      running_jobs[index] = sub_str(line, 0, strlen(line) - 1);
+      index++;
+    }
+    else {
+      printf("[%d] -Done\t%s", line_count, cmd);
+    }
+    line_count++;
+  }
+  running_jobs[index] = NULL;
+  fclose(fr);
+  FILE *fw = fopen("background/jobs.txt", "w");
+  for (int i = 0; running_jobs[i] != NULL; i++) 
+    fprintf(fw, "%s", running_jobs[i]);
+  fclose(fw);
+
+  return 1;
+}
+
+// Foreground builtin command.
+int shell_fg(char **args) {
+  FILE *f = fopen("background/jobs.txt", "r");
+  char line[100];
+  int pid, w;
+
+  if (args[1] == NULL) {
+    char *n_line;
+    while (fgets(line, 100, f) != NULL && strlen(line) > 0) 
+      n_line = sub_str(line, 0, strlen(line) - 1);
+    pid = atoi(get_pid(n_line));    
+  }
+  else {
+    int bool = 0;
+    pid = atoi(args[1]);
+    while (fgets(line, 100, f) != NULL && strlen(line) > 0) {
+      if (pid == atoi(get_pid(line)))
+        bool = 1;
+      if (bool != 1) {
+        printf("The process is not in the background\n");
+        return 1;
+      }
+    }
+  }
+
+  if (waitpid(pid, NULL, WNOHANG) == 0) {
+      do {
+        w = waitpid(pid, NULL, WNOHANG);
+      } while (w == 0);
+  }
+  else printf("Process finished in background\n");
+  
+  fclose(f);
+
   return 1;
 }

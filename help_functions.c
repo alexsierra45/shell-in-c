@@ -27,3 +27,47 @@ char **arr_cpy(char **arr, int i, int bool) {
   
   return a_c;
 }
+
+// count lines in a file
+int count_lines(char *path) {
+    FILE *file = fopen(path, "r");
+    int lines = 0;
+    int c;
+    while ((c = fgetc(file)) != EOF) {
+        if (c == '\n') {
+            lines++;
+        }
+    }
+    fclose(file);
+    return lines;
+}
+
+// concat the elements of an array
+char* concat_array(char** array) {
+  int array_size = 0;
+  while (array[array_size] != NULL)
+    array_size++;
+  int total_length = 0;
+  for (int i = 0; i < array_size; i++) {
+    total_length += strlen(array[i]);
+      if (i != array_size - 1) {
+        total_length++;
+      }
+  }
+
+  char* result = (char*) malloc((total_length + 1) * sizeof(char));
+
+  int index = 0;
+  for (int i = 0; i < array_size; i++) {
+      int len = strlen(array[i]);
+      memcpy(result + index, array[i], len);
+      index += len;
+      if (i != array_size - 1) {
+          result[index++] = ' ';
+      }
+  }
+
+  result[total_length] = '\0';
+
+  return result;
+}
