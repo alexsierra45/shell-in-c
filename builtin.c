@@ -17,6 +17,7 @@ int shell_jobs(char **args);
 int shell_fg(char ** args);
 int shell_history(char **args);
 int shell_unset(char **args);
+int shell_get(char **args);
 
 // List of builtin commands, followed by their corresponding functions.
 char *builtin_str[] = {
@@ -28,7 +29,8 @@ char *builtin_str[] = {
   "jobs",
   "fg",
   "history",
-  "unset"
+  "unset",
+  "get"
 };
 
 int (*builtin_func[]) (char **) = {
@@ -40,7 +42,8 @@ int (*builtin_func[]) (char **) = {
   &shell_jobs,
   &shell_fg,
   &shell_history,
-  &shell_unset
+  &shell_unset,
+  &shell_get
 };
 
 int lsh_num_builtins() {
@@ -248,6 +251,38 @@ int shell_unset(char **args) {
   else {
     char *var = args[1];
     delete_var(var);
+  }
+
+  return 1;
+}
+
+// Get bultin command
+int shell_get(char **args) {
+  if (args[1] == NULL) 
+    return 1;
+  else {
+    char *var = args[1];
+    char *var_dir = home_dir("variables.txt");
+    FILE *f = fopen(var_dir, "r");
+    char line[128];
+
+    while (fgets(line, 128, f) != NULL) {
+      int index = 0;
+      while (line[index] != '\n' && line[index] != '=') index++;
+      if (line[index] == '=') {
+        char *v = sub_str(line, 0, index - 2);
+        if (strcmp(v, var) == 0) {
+          printf("%s", sub_str(line, index + 2, strlen(line) - 1));
+          while(1) {
+            fgets(line, 128, f);
+            if (line[0] == '*') break;
+            printf("%s", line);
+          }
+
+          return 1;
+        }
+      }
+    }
   }
 
   return 1;
