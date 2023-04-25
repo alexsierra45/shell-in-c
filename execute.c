@@ -50,6 +50,11 @@ int shell_launch(char **args, int fdin, int fdout) {
     dup2(fd, 1);
     close(fd);
   }
+  if (strcmp(args[0], ">") == 0) {
+    FILE *f = fopen(args[1], "w");
+    fclose(f);
+    return 1;
+  }
 
   if (execvp(args[0], args) == -1) {
     perror("lsh");
