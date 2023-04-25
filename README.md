@@ -14,3 +14,4 @@ gcc -o main main.c
 - help
 - ctrl+c
 - background
+- history
