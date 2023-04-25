@@ -179,7 +179,6 @@ void manage_ctrl_c(int signal) {
     printf("\n");
 }
 
-
 void loop() {
   char *line;
   char **args;
