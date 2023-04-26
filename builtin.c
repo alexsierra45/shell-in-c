@@ -264,12 +264,18 @@ int shell_get(char **args) {
       if (line[index] == '=') {
         char *v = sub_str(line, 0, index - 2);
         if (strcmp(v, var) == 0) {
-          printf("%s", sub_str(line, index + 2, strlen(line) - 1));
+          char *output_dir = home_dir("output.txt");
+          FILE *fo = fopen(output_dir, "w");
+          char *substr = sub_str(line, index + 2, strlen(line) - 1);
+          printf("%s", substr);
+          fprintf(fo, "%s", substr);
           while(1) {
             fgets(line, 128, f);
             if (line[0] == '*') break;
             printf("%s", line);
+            fprintf(fo, "%s", line);
           }
+          fclose(fo);
 
           return 1;
         }
