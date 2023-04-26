@@ -1,0 +1,4 @@
+Nuestro proytecto permite que cuando un comando se este ejecutando se le pueda enviar un Ctrl+C. Nuestro shell
+captura la señal y aumenta un contador que inicialmente es igual a 0. EL shell no se detiene pero el proceso que
+estaba en ejecucion si. Si de manera consecutiva se presiona nuevamente Ctrl+C, se deteiene el shell, en caso contrario
+se reinicia el contador a 0.

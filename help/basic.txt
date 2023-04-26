@@ -1,5 +1,27 @@
-En este apartado encontramos 4 comandos ( | , < , > , >> ) que nos permitiran redirigir la entrada y la salida 
-de los comandos que ejecutemos.
+En este apartado encontramos 7 comandos ( cd, exit, | , < , > , >>, # ) que representan las funcionalidades 
+basicas del Shell.
+
+El comando cd <dir> cambia el directorio actual del shell al directorio especificado por el usuario, 
+si <dir> no se especifica se toma por default el home como directorio.
+
+Ejemplo:
+
+myshell $ cd new_dir # se mueve hacia la carpeta new_dir
+myshell $ cd         # se mueve hacia home
+
+Implementación:
+
+Se utiliza la función chdir() de c.
+
+--------------------
+
+El comando exit finaliza la ejecución del shell.
+
+Implementación:
+
+Se devuelve un 0 en el estado del proceso, el cual indica que el cliclo principal se debe detener.
+
+--------------------
 
 El comando cmd1 | cmd2 ejecuta <cmd1>, redirecciona la salida de <cmd1> a la entrada de <cmd2> y luego
 ejecuta <cmd2>.

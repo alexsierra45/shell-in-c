@@ -1,0 +1,12 @@
+En este apartado encontramos los espacios multiples. La idea es que se pueden introducir comandos com multiples
+especios entre los argumentos, la entrada sera leida e interpretada correctamente.
+
+Ejemplo:
+
+myshell $ ls   |  grep a  | sort   -r >   a
+
+Implementacion:
+
+Tenemos un metodo `decod_line` que hace varias modificaciones sobre la entrada inicial, una de ellas es que
+si el caracter i es un espacio, al igual que el caracter i-1, entonces no se guarda el caracter i. De esta forma
+nos nos evitamos tener en cuenta espacios de mas.

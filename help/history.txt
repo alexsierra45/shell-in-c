@@ -1,0 +1,41 @@
+En este apartado nos encontramos los comando ( history, again ), con los cuales podemos llevar un registro
+de los ultimos comandos ejecutados.
+
+El comando history imprime en la consola los ultimos 10 comandos ejecutados, siendo el comando 1 el menos reciente.
+
+Ejemplo:
+
+myshell $ history
+1: help
+2: exit
+3: ls
+4: cd ..
+5: cd probando
+6: mv main.c ..
+7: ls
+8: sleep 10
+9: fg 30192
+10: jobs
+
+Implementacion:
+
+Una vez finalizada la ejecucion de un comando, se guarda la linea de entrada en un archivo `history` alojado en /home.
+Si el archivo contiene mas de 10 comandos, se elimina el menos reciente y se agrega el nuevo. Un problema de la
+implementacion es que el comando history no se ve reflejado en el historial en la propia llamada que se le hace
+y esto es debido a que los comandos solo se guradan en el historial una vez hayan sido ejecutados, esto lo hacemos
+para evitar guardar comandos que condujeron a errores o entradas incorrectas.
+
+--------------------
+
+El comando again <number> ejecuta nuevamente el comando <number> en la lista del history. Si es llamado sin 
+parametros, se ejecuta el ultimo comando del history.
+
+Ejemplos:
+
+myshell $ again 3
+myshell $ again
+
+Implementacion:
+
+Una vez identificado que se trata del comando again, la entrada es sustituida por el comando correspondiente en el
+historial y ejecutado.

@@ -1,17 +1,18 @@
 En este apartado encontramos el comando help, que nos permite obtener informacion general del proyecto o
-informaciones especificas de los diferentes comandos implementados.
+informaciones especificas de los diferentes comandos implementados. Tambien se obtiene descripcion de los
+comandos propios de bash.
 
 El comando help nos brinda informacion general, como los nombres de los integrantes del equipo, las
 funcionalidades permitidas y los comandos built-in implementados.
 
-El comando help <cmd> nos brinda una informacion mas detallada sobre la funcion e implementacion de <cmd>. Aca se
-incluyen los comandos built-in con una ayuda personalizada y tambien los comandos que no son built-in.
+El comando help <keyword> nos brinda una informacion mas detallada sobre la funcion e implementacion de la
+funcionalidad <keyword>. Se explica y se dan ejemplos de los comandos asociados a esta keyword.
 
 Ejemplos:
 
 myshell $ help
-myshell $ help <built-in cmd>
-myshell $ help <not built-in cmd>
+myshell $ help basic
+myshell $ help if
 
 Para la implementacion de este comando, creamos una carpeta donde guardamos individualmente en archivos .txt
 las ayudas de cada uno de los comandos implementados. Solo bastaria acceder a dichos archivos e imprimir su

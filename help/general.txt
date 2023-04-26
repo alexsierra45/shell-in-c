@@ -1,16 +1,20 @@
 Integrantes:
-Alex Sierra Alcala-C311
+Alex Sierra Alcalá-C311
 Juan Carlos Espinosa Delgado-C311
 
 Funcionalidades:
 basic: Funcionalidades basicas del shell(3 puntos).
 multi-pipe: Tuberias multiples(1 punto).
 spaces: Mas de un espacio entre cada comando(0.5 puntos).
-chain: Operadores de cadenas(0.5 punto).
+chain: Operadores de cadenas(0.5 puntos).
 if: Condiciones(1 punto).
 help: Ayuda(1 punto)
+ctrl+c: Termina el proceso actual(0.5 puntos)
+history: Historial de comandos(0.5 puntos)
+background: Tener procesos en background(0.5 puntos)
+variables: Declarar variables(1 punto)
 
-Total: 7 puntos.
+Total: 9.5 puntos.
 
 Comandos built-in:
 cd: Cambia de directorio.
@@ -18,7 +22,16 @@ exit: Termina el Shell.
 help: Muestra esta ayuda.
 true: Siempre devuelve 0.
 false: Siempre devuelve 1.
+jobs: Devuelve los procesos que estan corriendo en el background.
+fg: Trae procesos del background al foreground.
+history: Devuelve los ultimos 10 comandos ejecutados.
+again: Ejecuta un comando previo.
+set: Le asigna valor a una variable.
+unset: Destruye una variable.
+get: Devuelve el valor de una variable.
 
 Lamentablemente solo se puede llamar al help desde la carpeta principal del proyecto.
+
+Para mas informacion sobre algun comando ejecute el comando help <keyword>
 
 Shell-in-C

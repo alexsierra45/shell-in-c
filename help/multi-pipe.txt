@@ -1,0 +1,12 @@
+En este apartado encontramos la funcionalidad multi-pipe, que permite usar multiples pipes en un solo comanado.
+
+Ejemplo:
+
+myshell $ cmd1 | cmd2 | cmd3 # la salida de <cmd1> es usada como entrada de <cmd2> y la salida de <cmd2>
+                               es usada como entrada de <cmd3>.
+
+Implementacion:
+
+La forma en la que esta implementada el comando pipe es la siguiente, una vez encontremos un pipe, se ejecuta
+lo que esta a la izquierda y su salida se le da de entrada a lo que esta en la derecha. De esta forma, si a la
+derecha hay tambien otro pipe, se ejecutara de forma analoga y ordenada, logrando que funcionen el multi-pipe.

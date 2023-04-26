@@ -1,0 +1,71 @@
+En este apartado encontramos 3 comandos ( set, getm unset ) encargados de la asignacion y destruccion de variables.
+
+El comando set <var> <value> le asigna a la variable con nombre <var> el valor <value>. Esta ademas implementada
+la funcionalidad set <var> `<command>` que ejecute el <command> dentro de `` y su salida se la asigna como valor
+a la variable <var>. Si <var> ya tenia un valor asigando, este es sobrescirto. La llamada al comando set solamente
+imprime en consola cada variable con su valor respectivo asigando.
+
+Ejemplos:
+
+myshell $ set x ab cd ef # le asigna a x como valor el string 'ab cd ef'
+myshell $ set y 3
+myshell $ set z `ls`
+myshell $ set
+x = ab cd ef
+y = 3
+z = README.md
+builtin.c
+execute.c
+help
+help_functions.c
+loop_functions.c
+main
+main.c
+
+Implementacion:
+
+Primero se diferencian los casos, si estamos en presencia de una entrada con `` o no, o si el set no tiene
+argumentos. Cuando la entrada tiene `` se ejecuta el comando que esta en el interior, su salida se guarda en un
+archivo `output` alojado en /home y luego en un archivo `variables`, igual alojado en /home, se escribe 
+<var> = <value>. Si la entrada no tiene ``, el desarrollo es el mismo solo que sin ejecutar ningun comando. Para
+la entrada sin parametros, simplemente se lee linea por linea del arvhivo `variables`.
+
+--------------------
+
+El comando unset <var> elimina la variable <var> del archivo de variables.
+
+Ejemplos:
+
+myshell $ set a 3
+set b 2
+myshell $ set
+a = 3
+b = 2
+myshell $ unset a
+myshell $ set
+b = 2
+
+Implementacion:
+
+Cada variable en el archivo `variables`, tiene para marcar el fin de su valor un caracter *, lo cual nos facilita
+la idea de limitar donde empieza una variable y donde acaba. Con esta idea, eliminar una variable del registro es 
+solamente eliminar las lineas que hacen referencia a ella en el el archivo.
+
+--------------------
+
+El comando get <var> devuelve en pantalla el valor asignado a la variable <var>.
+
+Ejemplos:
+
+myshell $ set a 3
+myshell $ get a
+3
+myshell $ set b `get a`
+myshell $ set 
+a = 3
+b = 3
+
+Implementacion:
+
+Como mismo en la implementacion de unset, eliminabamos las lineas que hacian referencia a dicha variable, para get
+fue exactamente lo mismo, solo que una vez identificadas las lineas, las imprimiamos en consola.

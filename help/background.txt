@@ -1,0 +1,47 @@
+En este apartado encontramos los comandos ( $, jobs, fg ) que estan encargados del manejo de procesos en el background.
+
+El caracter & toma todo lo que escrito antes de el y lo envia como proceso al background.
+
+Ejemplos:
+
+myshell $ sleep 10 &
+[1]     30209
+myshell $ mv file .. &
+[2]     12418
+
+Implementacion:
+
+Simplemente se inicia un proceso hijo y no se espera por el. Automaticamente el comando es guardado en un archivo
+`jobs` alojado en /home.
+
+--------------------
+
+El comando jobs simplemente lista los procesos que estan corriendo en el background, en caso de que hayan terminado
+avisa con un +Done, luego no los lista mas.
+
+Ejemplo:
+
+myshell $ sleep 5 && ls &
+myshell $ sleep 10 &
+myshell $ jobs
+[1] -Done       sleep 5 && ls
+[2] +Running    sleep 10
+
+Implementacion:
+
+Solo lee del archivo `jobs` e imprime los comandos en consola con su respectivo pid.
+
+--------------------
+
+El comando fg <number> trae al comando con pid igual a <number> del background al foreground.
+
+Ejemplo:
+
+myshell $ sleep 1 &
+[1]     15326
+myshell $ fg 15326
+
+Implementacion:
+
+Se ubica el pid en la lista de procesos en background, si ya termino, es informado al usuario, en caso contrario
+se espera por el hasta que concluya su ejecucion.
