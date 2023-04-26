@@ -1,6 +1,5 @@
 # Shell-in-c
-## To run it :
-<!-- define a code section -->
+## Para ejecutar el proyecto :
 ```bash
 gcc -o main main.c
 ./main
@@ -16,3 +15,5 @@ gcc -o main main.c
 - background
 - history
 - variables
+
+Para más informacion del funcionamiento ejecute el comando help.
