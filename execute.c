@@ -77,8 +77,9 @@ int pipes(char **args, int fdin, int fdout) {
       pid = fork();
       if (pid == 0) {
         close(fd[0]);
-        shell_launch(a_bef, fdin, fd[1]);
+        execute(a_bef, fdin, fd[1], 1);
         close(fd[1]);
+        exit(0);
       } else {
         wait(NULL);
         close(fd[1]);
