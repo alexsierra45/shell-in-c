@@ -20,7 +20,6 @@ int shell_get(char **args);
 
 // List of builtin commands, followed by their corresponding functions.
 char *builtin_str[] = {
-  "cd",
   "help",
   "true",
   "false",
@@ -32,7 +31,6 @@ char *builtin_str[] = {
 };
 
 int (*builtin_func[]) (char **) = {
-  &shell_cd,
   &shell_help,
   &shell_true, 
   &shell_false,
@@ -45,6 +43,30 @@ int (*builtin_func[]) (char **) = {
 
 int lsh_num_builtins() {
   return sizeof(builtin_str) / sizeof(char *);
+}
+
+int execute_builtin(char **args, int fdin, int fdout) {
+  for (int i = 0; i < lsh_num_builtins(); i++) {
+    if (strcmp(args[0], builtin_str[i]) == 0) {
+      int pid = fork();
+      if (pid == 0) {
+        dup2(fdin, 0);
+        dup2(fdout, 1);
+        exit((*builtin_func[i])(args));
+      }
+      else {
+        int status;
+        wait(&status);
+        int result = status == 0 ? 0 : 1;
+        return result;
+      }
+    }
+  }
+
+  if (strcmp(args[0], "cd") == 0) return shell_cd(args);
+  if (strcmp(args[0], "exit") == 0) exit(0);
+
+  return -1;
 }
 
 // Builtin function implementations.
@@ -70,7 +92,7 @@ int shell_help(char **args) {
     int fd = open("help/general.txt", O_RDONLY);
     ssize_t bytes_read;
     while ((bytes_read = read(fd, buf, 1000)) > 0) {
-      write(1, buf, bytes_read);
+      write(STDOUT_FILENO, buf, bytes_read);
     }
     free(buf);
     close(fd);
@@ -96,7 +118,7 @@ int shell_help(char **args) {
       return 1;
     }
     while ((bytes_read = read(fd, buf, 1000)) > 0) {
-      write(1, buf, bytes_read);
+      write(STDOUT_FILENO, buf, bytes_read);
     }
     free(buf);
     close(fd);
@@ -264,18 +286,12 @@ int shell_get(char **args) {
       if (line[index] == '=') {
         char *v = sub_str(line, 0, index - 2);
         if (strcmp(v, var) == 0) {
-          char *output_dir = home_dir("output.txt");
-          FILE *fo = fopen(output_dir, "w");
-          char *substr = sub_str(line, index + 2, strlen(line) - 1);
-          printf("%s", substr);
-          fprintf(fo, "%s", substr);
+          printf("%s", sub_str(line, index + 2, strlen(line) - 1));
           while(1) {
             fgets(line, 128, f);
             if (line[0] == '*') break;
             printf("%s", line);
-            fprintf(fo, "%s", line);
           }
-          fclose(fo);
 
           return 1;
         }

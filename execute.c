@@ -10,12 +10,24 @@ int execute(char **args, int fdin, int fdout, int master);
 
 // Launch a program.
 int shell_launch(char **args, int fdin, int fdout) {
-  dup2(fdin, 0);
-  dup2(fdout, 1);
-  
-  if (execvp(args[0], args) == -1) {
-    printf("Command not found\n");
-    return -1;
+  int pid = fork();
+  if (pid == 0) {
+    dup2(fdin, 0);
+    dup2(fdout, 1);
+    if (execvp(args[0], args) == -1) {
+      printf("Command not found\n");
+      exit(-1);
+    }
+  }
+  else {
+    int status;
+    wait(&status);
+    if (WIFEXITED(status)) {
+      int exit_status = WEXITSTATUS(status);
+      if (exit_status == 255) 
+        return -1;
+    }
+    return 0;
   }
 }
 
@@ -44,16 +56,20 @@ int red_out(char **args, int fdin, int fdout) {
       }
       else {
         args[i] = NULL;
-        int fd = open(args[i+1], O_RDWR | O_CREAT, 0644);
+        int fd = open(args[i+1], O_WRONLY | O_CREAT, 0644);
         execute(args, fdin, fd, 0);
+        close(fd);
+        dup2(fdout, 1);
       }
       
       return 0;
     }
     else if (strcmp(args[i], ">>") == 0) {
       args[i] = NULL;
-      int fd = open(args[i+1], O_RDWR | O_CREAT | O_APPEND, 0644);
+      int fd = open(args[i+1], O_WRONLY | O_CREAT | O_APPEND, 0644);
       execute(args, fdin, fd, 0);
+      close(fd);
+      dup2(fdout, 1);
 
       return 0;
     }
@@ -293,7 +309,7 @@ int lsh_num_operators() {
 
 // Execute shell built-in or launch program.
 int execute(char **args, int fdin, int fdout, int master) {
-  if (strcmp(args[0], "again") == 0) {
+ if (strcmp(args[0], "again") == 0) {
     char *a[3] = {args[0], args[1], NULL};
     args = shell_again(a);
   }
@@ -307,27 +323,12 @@ int execute(char **args, int fdin, int fdout, int master) {
     if (result != -1) 
       return master ? 1 : result;
   }
-  for (int i = 0; i < lsh_num_builtins(); i++) {
-    if (strcmp(args[0], builtin_str[i]) == 0) {
-      int result = (*builtin_func[i])(args);
-      return master ? 1 : result;
-    }
-    if (strcmp(args[0], "exit") == 0) return 0;
-  }
-  int pid = fork();
-  if (pid == 0) {
-    if (shell_launch(args, fdin, fdout) == -1)
-      exit(-1);
-  }
-  else {
-    int status;
-    wait(&status);
-    if (WIFEXITED(status)) {
-      int exit_status = WEXITSTATUS(status);
-      if (exit_status == 255) 
-        return -1;
-    }
-  }
+  
+  // Search for builtin commands
+  int result = execute_builtin(args, fdin, fdout);
+  if (result != -1) return master ? 1 : result;
+
+  if (shell_launch(args, fdin , fdout) == -1) return -1;
   
   return master ? 1 : 0;
 }
